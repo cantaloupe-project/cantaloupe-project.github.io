@@ -11,7 +11,7 @@ $('#download-scroller').on('click', function(e) {
  * in a callback.
  */
 function getLatestRelease(onComplete) {
-    var releasesURL = 'https://api.github.com/repos/medusa-project/cantaloupe/releases';
+    var releasesURL = 'https://api.github.com/repos/cantaloupe-project/cantaloupe/releases';
     $.getJSON(releasesURL).done(function(releases) {
         // Filter out betas
         releases = releases.filter(r => r.tag_name.indexOf('beta') === -1);
