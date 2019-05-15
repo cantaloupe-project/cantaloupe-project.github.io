@@ -1,0 +1,201 @@
+---
+layout: manual_5.0
+title: Metadata
+---
+
+<h1>Metadata</h1>
+
+<ul class="toc">
+  <li><a href="#Overview">Overview</a></li>
+  <li><a href="#Standards">Standards</a></li>
+  <li><a href="#Processor%20Support">Processor Support</a></li>
+  <li><a href="#Copying%20Mutating">Copying &amp; Mutating</a>
+    <ul>
+      <li><a href="#Verbatim%20Copying">Verbatim Copying</a></li>
+      <li><a href="#Adding%20Properties">Adding Properties</a>
+      <li><a href="#Modifying%20Properties">Modifying Properties</a>
+    </ul>
+  </li>
+  <li><a href="#Implementation%20Notes">Implementation Notes</a></li>
+</ul>
+
+<h2 id="Overview">Overview</h2>
+
+<p>Some image formats support embedded metadata, which may contain information about image characteristics, as well as user- and/or device-supplied information about authoring, copyright, camera settings, and so on. This metadata may be encoded in a standard cross-format encoding like EXIF, IPTC IIM, or XMP, or it may use an encoding that is specific to a particular image format. More than one encoding may be present in the same file.</p>
+
+<p>During a response, an entirely new image is generated and returned to the client. In some cases it might be desired that this image contain some subset of metadata from the source image, or all of it, or that new metadata be added to it.</p>
+
+<h2 id="Standards">Standards</h2>
+
+<dl>
+  <dt><a href="https://en.wikipedia.org/wiki/Exif">EXIF</a></dt>
+  <dd>Typically written by devices like cameras and scanners and not meant to be edited. Uses the TIFF file format (consisting of "directories," "tags," and "fields") for serialization, and many terms overlap with the ones in the "Baseline TIFF" specification. Terms can also be represented in XMP.</dd>
+  <dt><a href="https://iptc.org/standards/iim/">IPTC IIM</a></dt>
+  <dd>Serialization and vocabulary developed by the IPTC. Simple binary encoding with a fixed vocabulary. The serialization is not used much anymore, but the vocabulary has been migrated to the "IPTC Core" schema used in XMP.</dd>
+  <dt><a href="https://www.adobe.com/products/xmp.html">XMP</a></dt>
+  <dd>RDF-based encoding developed by Adobe. Widely supported across many formats and even non-image media files. May contain terms from the EXIF and IPTC standards as well as from other vocabularies. The current de facto embedded metadata standard.</dd>
+  <dt>Native standards</dt>
+  <dd>Some image formats define their own metadata standards. PNG and TIFF define small term vocabularies, for example.</dd>
+</dl>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th></th>
+      <th>EXIF</th>
+      <th>IPTC IIM</th>
+      <th>XMP</th>
+      <th>Native</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>GIF</td>
+      <td class="bg-danger">&times;</td>
+      <td class="bg-danger">&times;</td>
+      <td class="bg-success">&check;</td>
+      <td class="bg-danger">&times;</td>
+    </tr>
+    <tr>
+      <td>JPEG</td>
+      <td class="bg-success">&check;</td>
+      <td class="bg-success">&check;</td>
+      <td class="bg-success">&check;</td>
+      <td class="bg-danger">&times;</td>
+    </tr>
+    <tr>
+      <td>JPEG2000</td>
+      <td class="bg-danger">&times;</td>
+      <td class="bg-success">&check;</td>
+      <td class="bg-success">&check;</td>
+      <td class="bg-danger">&times;</td>
+    </tr>
+    <tr>
+      <td>PNG</td>
+      <td class="bg-danger">&times;</td>
+      <td class="bg-danger">&times;</td>
+      <td class="bg-success">&check;</td>
+      <td class="bg-success">&check;</td>
+    </tr>
+    <tr>
+      <td>TIFF</td>
+      <td class="bg-success">Stored in baseline IFD and several sub-IFDs</td>
+      <td class="bg-success">Stored in sub-IFD 33723</td>
+      <td class="bg-success">Stored in sub-IFD 700</td>
+      <td class="bg-success">Baseline IFD tags</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="Processor Support">Processor Support</h2>
+
+<p>Not all processors are metadata-aware; see the <a href="processors.html#Supported%20Features">table of processor-supported features</a>.</p>
+
+<h2 id="Copying & Mutating">Copying &amp; Mutating</h2>
+
+<p>While Cantaloupe is capable of reading several different source metadata formats, it can write only XMP. This simplifies the metadata API and reduces crosswalking challenges, as XMP is flexible enough to express EXIF and IIM with no information loss. XMP can also be embedded into many image formats and is widely supported by imaging software.</p>
+
+<p>XMP is serialized as RDF/XML. A very simple XMP packet might look like:</p>
+
+{% highlight xml %}
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+    <rdf:Description rdf:about=""
+                     xmlns:aux="http://ns.adobe.com/exif/1.0/aux/"
+                     xmlns:xmp="http://ns.adobe.com/xap/1.0/"
+                     xmlns:photoshop="http://ns.adobe.com/photoshop/1.0/"
+                     xmlns:dc="http://purl.org/dc/elements/1.1/">
+        <aux:Lens>5.4-10.8mm</aux:Lens>
+        <aux:FlashCompensation>0/1</aux:FlashCompensation>
+        <aux:Firmware>Firmware Version 1.00</aux:Firmware>
+        <aux:OwnerName>Ansel Adams</aux:OwnerName>
+        <xmp:CreateDate>2002-07-14T09:01:42</xmp:CreateDate>
+        <xmp:ModifyDate>2002-07-14T09:01:42</xmp:ModifyDate>
+        <xmp:CreatorTool>Photos 1.5</xmp:CreatorTool>
+        <photoshop:DateCreated>2002-07-14T09:01:42</photoshop:DateCreated>
+        <dc:subject>
+            <rdf:Bag>
+                <rdf:li>Mountains</rdf:li>
+                <rdf:li>Scenery</rdf:li>
+                <rdf:li>Landscapes</rdf:li>
+            </rdf:Bag>
+        </dc:subject>
+    </rdf:Description>
+</rdf:RDF>
+{% endhighlight %}
+
+<p>The following sections use this packet for a crash course on practical metadata manipulation. Note that the <a href="https://www.adobe.com/devnet/xmp.html">XMP standard</a> is quite complex and is based on <a href="https://www.w3.org/RDF/">RDF</a>, which itself is complex, so what follows is not implied to be a replacement for the several hundred pages of reading needed to fully grasp those respective standards.</p>
+
+<h3 id="Verbatim Copying">Verbatim Copying</h3>
+
+<p>The above XMP packet can be copied verbatim from a source image into derivative images quite easily:</p>
+
+{% highlight ruby %}
+def metadata(options = {})
+  context['metadata']['xmp_string']
+end
+{% endhighlight %}
+
+<h3 id="Adding Properties">Adding Properties</h3>
+
+<p>Continuing with the example above, we assume that the source image's IPTC metadata contains a copyright statement that we'd like to copy into derivative images' XMP data.</p>
+
+<p>According to the <a href="https://www.iptc.org/std/IIM/4.1/specification/IIMV4.1.pdf">IPTC IIM standard</a>, the tag most likely to contain a copyright statement is <code>CopyrightNotice</code> (p. 39).</p>
+
+{% highlight ruby %}
+def metadata(options = {})
+  metadata = context['metadata']
+  iptc = metadata['iptc']
+  if iptc
+    copyright = iptc.find{ |d| d['tagName'] == 'CopyrightNotice' }
+    if copyright
+      # TODO: write this
+    end
+  end
+end
+{% endhighlight %}
+
+<h3 id="Modifying Properties">Modifying Properties</h3>
+
+<p>In this example, we want to remove any <code>dc:title</code> property that may be present in the source XMP, and add our own. We use <a href="https://jena.apache.org/documentation/javadoc/jena/org/apache/jena/rdf/model/Model.html">Jena</a> to do this.</p>
+
+{% highlight ruby %}
+java_import java.io.StringWriter
+
+def metadata(options = {})
+  metadata = context['metadata']
+  model = metadata['xmp_model']
+  if model
+    # Search for dc:title properties.
+    prop = model.createProperty('http://purl.org/dc/elements/1.1/title')
+    it = model.listStatements(nil, prop, nil)
+
+    # Remove them.
+    it.removeNext while it.hasNext
+
+    # Add a custom dc:title property.
+    res = model.createResource
+    obj = model.createLiteral('Hello world', false)
+    stmt = model.createStatement(res, prop, obj)
+    model.add(stmt)
+
+    # Write the model to XML and return it.
+    writer = nil
+    begin
+      writer = StringWriter.new
+      model.write(writer);
+      return writer.toString
+    ensure
+      writer&.close
+    end
+  end
+  nil
+end
+{% endhighlight %}
+
+<h3 id="Implementation Notes">Implementation Notes</h3>
+
+<ul>
+  <li>After metadata is initially read from a source image, it may be <a href="caching.html#Derivative%20Cache">cached</a>, in which case subsequent requests will read it from the cache rather than the source image. In this case, changes to the source image's metadata will not be reflected in the application until the cached metadata becomes invalid and is re-read. If you need to change a source image's metadata, you should manually <a href="remote-management.html#PurgeItemFromCache">purge any cached content relating to it</a> afterwards.</li>
+  <li>IPTC IIM supports many different character encodings, but Cantaloupe supports only UTF-8, ASCII, and ISO Latin 1, all of which get converted to UTF-8 internally.</li>
+  <li>XMP sidecar files are not supported.</li>
+</ul>

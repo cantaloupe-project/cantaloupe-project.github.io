@@ -23,6 +23,7 @@ title: Caching
           <li><a href="#S3Cache">S3Cache</a></li>
           <li><a href="#AzureStorageCache">AzureStorageCache</a></li>
           <li><a href="#RedisCache">RedisCache</a></li>
+          <li><a href="#DynamoDBCache">DynamoDBCache</a></li>
         </ul>
       </li>
     </ul>
@@ -93,6 +94,7 @@ cache.client.no_transform = true
 <ul>
   <li>Requests for full-sized, unaltered source images are not cached, and are instead streamed through with no processing.</li>
   <li>IIIF information response representations are not cached&mdash;only image info, which is the only expensive part to acquire. This means that other configuration options that would affect the contents of information responses can be changed without invalidating the cache.</li>
+  <li>Cached information includes image dimensions, tile dimensions, metadata, and maybe other properties. When the derivative cache is enabled, source images should not be modified in ways that would change any of these properties without their identifier also changing. If a source image needs to be changed, it should either receive a new identifier, or any cached info relating to it should be manually<a href="remote-management.html#PurgeItemFromCache">purged</a>.</li>
   <li>The derivative cache is shared across endpoints. Requests for the same image from different endpoints will return the same cached image.</li>
 </ul>
 
@@ -125,14 +127,14 @@ cache.client.no_transform = true
   <dt>Conservative (<code>cache.server.resolve_first = true</code>)</dt>
   <dd>Source images are looked up and verified to exist before cached representations are returned. This precludes returning a cached representation when the underlying resource no longer exists, but also impairs response times by a variable amount, depending on the source.</dd>
   <dt>Aggressive (<code>cache.server.resolve_first = false</code>)</dt>
-  <dd>Cached content is returned immediately, if available. This is faster, but inconsistency can develop between the cache and the underlying source image storage if the latter is not static.</dd>
+  <dd>Cached content is returned immediately, if available. This is faster, but inconsistency can develop between the source and the cache if the former is not static.</dd>
 </dl>
 
 <hr>
 
 <h3 id="Maintenance">Maintenance</h3>
 
-<p>Because cached content is not automatically deleted after becoming invalid, there will likely be a certain amount of invalid content taking up space in the cache at any given time. Without periodic maintenance, the amount can only grow. If this is a problem, it can be dealt with manually via the <a href="remote-management.html#HTTP%20API">HTTP API</a>, or automatically, using a cache worker, which periodically cleans and purges invalid items. (See the <code>cache.server.worker.*</code> configuration options.)</p>
+<p>Because cached content is not automatically deleted after becoming invalid, there will likely be a certain amount of invalid content taking up space in the cache at any given time. Without periodic maintenance, the amount can only grow. If this is a problem, it can be dealt with manually using the <a href="remote-management.html#HTTP%20API">HTTP API</a>, or automatically using the cache worker, which periodically purges invalid items. (See the <code>cache.server.worker.*</code> configuration options.)</p>
 
 <hr>
 
@@ -336,4 +338,18 @@ CREATE INDEX identifier_idx ON {JdbcCache.info_table} (identifier);
   <li><code>RedisCache.database</code></li>
 </ul>
 
-<p>Unlike with the other caches, cache policy is configured on the Redis side, and <code>cache.server.derivative.ttl_seconds</code> will have no effect with this cache. Likewise, if enabled, the <a href="#Maintenance">cache worker</a> will remain idle.</p>
+<p>Unlike with the other caches, cache policy is configured on the Redis side, and <code>cache.server.derivative.ttl_seconds</code> has no effect with this cache. Likewise, if enabled, the <a href="#Maintenance">cache worker</a> will remain idle.</p>
+
+<hr>
+
+<h4 id="DynamoDBCache">DynamoDBCache</h4>
+
+<p><a href="https://aws.amazon.com/dynamodb/">DynamoDB</a> is a high-performance NoSQL database in Amazon Web Services (AWS). This cache caches derivative images and infos in a DynamoDB table.</p>
+
+<p>This cache does not create the table itself. You must create the table with a string-type primary key named <code>PrimaryKey</code>.</p>
+
+<p>You should also consider setting up "time-to-live" (TTL) on the table, which will enable DynamoDB to periodically sweep through and purge invalid items, potentially reducing storage costs. Use <code>Expires</code> as the TTL column. When TTL is enabled, the <a href="#Maintenance">cache worker</a> is not needed.</p>
+
+<p>After creating the table, you may notice poor performance with the default provisioned throughout value. Increase this value to reduce the I/O bottleneck, or consider switching to the on-demand capacity mode.</p>
+
+<p>Due to limitations of DynamoDB, this cache supports a maximum cached item size of a little under 4 MiB. In most cases, this should be enough for the vast majority of images.</p>

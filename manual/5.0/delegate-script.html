@@ -147,11 +147,11 @@ end
 
 <h2 id="Improving Efficiency">Improving Efficiency</h2>
 
-<p>Several delegate methods will be called over the course of a single request, and making them as efficient as possible will improve response times. A couple of techniques for improving efficiency are:</p>
+<p>Several delegate methods will be called over the course of a single request, and making them as efficient as possible will improve response times. A couple of ways to improve efficiency are:</p>
 
 <h3 id="Sharing Information">Sharing Information</h3>
 
-<p>Some methods may need to do similar work, which may be expensive. To avoid having to do it twice, a useful technique is to cache the result. So, rather than doing this:</p>
+<p>Some methods may need to do similar work, which may be expensive. To avoid having to do it twice, a useful technique is to cache the first result. So, rather than doing this:</p>
 
 {% highlight ruby %}
 class CustomDelegate
@@ -160,7 +160,7 @@ class CustomDelegate
   end
 
   def method2(options = {})
-    # perform an expensive query and return the result
+    # perform the same expensive query and return the result
   end
 end
 {% endhighlight %}
@@ -190,11 +190,11 @@ end
 
 <h3 id="Connection Pooling">Connection Pooling</h3>
 
-<p>Most HTTP clients maintain an internal connection pool automatically, but JDBC adapters do not. Any code that accesses a database via JDBC should use a connection pool to improve performance. As of now, there is no &quot;official&quot; provision for this. Options include:</p>
+<p>Most HTTP clients maintain an internal connection pool automatically, but JDBC adapters do not. When accessing a database via JDBC, consider using a connection pool to improve performance. As of now, there is no &quot;official&quot; provision for this, but some options include:</p>
 
 <ol>
-  <li>Use the built-in HikariCP pool used by JdbcSource and JdbcCache, noting that HikariCP is not part of the delegate script contract and may change or go away at some point (see <a href="https://github.com/medusa-project/cantaloupe/issues/221#issuecomment-398402952">here</a> for an example that may or may not work);</li>
-  <li>Supply a third-party connection pool JAR;</li>
+  <li>Use the built-in HikariCP pool used by JdbcSource and JdbcCache, noting that HikariCP is not part of the delegate script contract and may change or go away at some point (see <a href="https://github.com/cantaloupe-project/cantaloupe/issues/221#issuecomment-398402952">here</a> for an example that may or may not work);</li>
+  <li>Supply a third-party connection pooling library as a JAR;</li>
   <li>Write your own connection pool</li>
 </ol>
 

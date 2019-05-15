@@ -1,9 +1,9 @@
 ---
 layout: manual_5.0
-title: Deployment
+title: Deployment & Tuning
 ---
 
-<h1>Deployment</h1>
+<h1>Deployment &amp; Tuning</h1>
 
 <ul class="toc">
   <li><a href="#Temporary%20Directory">Temporary Directory</a></li>
@@ -12,7 +12,12 @@ title: Deployment
   <li><a href="#Hardware">Hardware</a>
     <ul>
       <li><a href="#HardwareCPU">CPU</a></li>
-      <li><a href="#HardwareMemory">Memory</a></li>
+      <li><a href="#HardwareMemory">Memory</a>
+        <ul>
+          <li><a href="#MemoryHeapMemory">Heap Memory</a></li>
+          <li><a href="#MemoryGarbageCollection">Garbage Collection</a></li>
+        </ul>
+      </li>
       <li><a href="#HardwareStorage">Storage</a></li>
     </ul>
   </li>
@@ -25,29 +30,27 @@ title: Deployment
     </ul>
   </li>
   <li><a href="#SSL/TLS">SSL/TLS</a></li>
-  <li><a href="#HTTP/2">HTTP/2</a></li>
-  <li><a href="#Docker">Docker</a></li>
 </ul>
 
-<p>This page gathers some miscellaneous notes on production deployment.</p>
+<p>This page gathers some miscellaneous notes on production deployment and performance tuning.</p>
 
 <hr>
 
 <h2 id="Temporary Directory">Temporary Directory</h2>
 
-<p>When running in standalone mode, the embedded Jetty server, by default, caches class files in the system temp directory, which most operating systems will periodically clean out. If this happens while the application is running, it can lead to <code>NoClassDefFoundError</code>s that can only be remedied by restarting the application. Consider either reconfiguring your OS's temp-cleaning strategy to work only at boot or shutdown, or setting the <code>temp_pathname</code> configuration key to use a different location for temporary data.</p>
+<p>By default, when running in standalone mode, the embedded Jetty server caches class files in the system temp directory, which most operating systems will periodically clean out. If this happens while the application is running, it can cause <code>NoClassDefFoundError</code>s that can only be remedied by restarting the application. Consider either reconfiguring your OS's temp-cleaning strategy to work only at boot or shutdown, or setting the <code>temp_pathname</code> configuration key to use a different location for temporary data.</p>
 
 <hr>
 
 <h2 id="Images">Images</h2>
 
-<p>Some image formats are inherently more efficient to serve than others. If you have control over your source image formats, see the <a href="images.html">Images</a> section for recommendations.</p>
+<p>Some image formats are inherently more efficient to process than others. If you have control over your source image formats, see the <a href="images.html">Images</a> section for recommendations.</p>
 
 <hr>
 
 <h2 id="Health Checks">Health Checks</h2>
 
-<p>A health check endpoint is available as part of the <a href="remote-management.html#check-health">HTTP API</a>.
+<p>While the root path can be used for basic health checks, a dedicated health check endpoint that exercises more of the application is available as part of the <a href="remote-management.html#check-health">HTTP API</a>.</p>
 
 <hr>
 
@@ -55,15 +58,17 @@ title: Deployment
 
 <h3 id="HardwareCPU">CPU</h3>
 
-<p>Cantaloupe uses a thread-per-request model, and maintains a thread pool to carry out certain tasks asynchronously and spread work across processors. Response times will benefit from multiple fast cores.</p>
+<p>Cantaloupe allocates one thread per request, and maintains a thread pool to carry out certain tasks asynchronously and spread work across processors. Response times will benefit from multiple fast cores.</p>
 
-<p>Some source formats are more processor-intensive than others. JPEG2000 via <a href="processors.html#OpenJpegProcessor">OpenJpegProcessor</a>, for example, will demand much more from a CPU than uncompressed TIFF via <a href="processors.html#Java2dProcessor">Java2dProcessor</a>.</p>
+<p>Some source formats are more processor-intensive than others. JPEG2000 via <a href="processors.html#OpenJpegProcessor">OpenJpegProcessor</a>, for example, will work the CPU much harder than uncompressed TIFF via <a href="processors.html#Java2dProcessor">Java2dProcessor</a>.</p>
 
 <h3 id="HardwareMemory">Memory</h3>
 
 <p>Memory requirements will vary greatly depending on <a href="processors.html">processors</a> used, source format, source image size, request image size, and request frequency. Image formats that don't support tiling or that can't be selectively decoded will require more memory to process (see <a href="#Images">Images</a>). The application will log an <code>ERROR</code>-level message if it runs out of memory.</p>
 
-<p>As a Java application, the application runs "sandboxed" inside a Java Virtual Machine (JVM), and can only use the memory the JVM makes available to it. The main area of memory of concern inside the JVM is called the heap, and, <a href="#Docker">unless running in Docker</a>, its size characteristics must be configured at startup using arguments to the <code>java</code> command. The two most important are:</p>
+<h4 id="MemoryHeapMemory">Heap Memory</h4>
+
+<p>As a Java application, the application runs "sandboxed" inside a Java Virtual Machine (JVM), and can only use the memory the JVM makes available to it. The main area of memory of concern inside the JVM is called the heap, and its size characteristics must be configured at startup using arguments to the <code>java</code> command. The two most important are:</p>
 
 <dl>
   <dt><code>-Xms</code></dt>
@@ -71,6 +76,8 @@ title: Deployment
   <dt><code>-Xmx</code></dt>
   <dd>Maximum heap size.</dd>
 </dl>
+
+<div class="alert alert-info"><i class="fa fa-info-circle"></i> These arguments aren't necessary in Docker, as JRE 8u191 introduced support for auto-detecting container CPU and memory settings.</div>
 
 <p>The commands in the <a href="getting-started.html">Getting Started</a> section specify a relatively small maximum heap size, and a production server may need larger.</p>
 
@@ -80,6 +87,12 @@ title: Deployment
   <img src="images/jconsole.png" class="img img-fluid" alt="JConsole screenshot">
   <figcaption>Screenshot of JConsole</figcaption>
 </figure>
+
+<h4 id="MemoryGarbageCollection">Garbage Collection</h4>
+
+<p>In Java, heap memory is freed automatically by a garbage collector (GC) that runs in the JVM. One of the problems with garbage collection in Java is that it can cause periodic freezes of all applications running in the VM.</p>
+
+<p>Over the years, the JVM's default GC implementation has changed from time to time as new GCs have been developed that try to reduce the pauses and improve the efficiency of garbage collection in general. Java 7 and 8 use the <a href="https://docs.oracle.com/javase/8/docs/technotes/guides/vm/gctuning/parallel.html">Parallel GC</a>. The <a href="https://www.oracle.com/technetwork/tutorials/tutorials-1876574.html">G1</a> GC became the default in Java 9. Java 11 introduced <a href="https://openjdk.java.net/jeps/333">ZGC</a> as an experimental new GC, and Java 12 introduced <a href="https://openjdk.java.net/jeps/189">Shenandoah</a> as another experimental GC. All of these GCs can be tried out by passing command-line arguments to the <code>java</code> invocation.</p>
 
 <h3 id="HardwareStorage">Storage</h3>
 
@@ -206,15 +219,3 @@ title: Deployment
 <p>In standalone mode, Cantaloupe supports TLS connections over HTTPS, configurable via the <code>https.*</code> keys in the configuration file. The general process for getting this working is to add a signed X.509 certificate to either a Java KeyStore (JKS) or PKCS#12 key store, and then refer to the key store file with the <code>https.key_store_path</code> configuration option.</p>
 
 <p>HTTPS can also be enabled on a Servlet container or <a href="#Reverse-Proxying">reverse-proxying web server</a>, in which case Cantaloupe would require no special configuration.</p>
-
-<hr>
-
-<h2 id="HTTP/2">HTTP/2</h2>
-
-<p>HTTP/2 is supported since version 3.4 via the <code>http.http2.enabled</code> and <code>https.http2.enabled</code> configuration keys. H2C (unencrypted) works in Java 8, but H2S (encrypted) requires at least Java 9.</p>
-
-<hr>
-
-<h2 id="Docker">Docker</h2>
-
-<p>When running in Docker, consider using JRE 8u191 or later. This version includes support for auto-detecting container CPU and memory settings (see <a href="https://www.oracle.com/technetwork/java/javase/8u191-relnotes-5032181.html#JDK-8146115">JDK 8u191 Update Release Notes</a>) as an alternative to using VM arguments like <code>-Xmx</code>.</p>

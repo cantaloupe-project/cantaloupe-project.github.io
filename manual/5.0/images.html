@@ -105,10 +105,6 @@ title: Images
 
 <p><a href="processors.html#OpenJpegProcessor">OpenJpegProcessor</a> uses the <a href="http://www.openjpeg.org">OpenJPEG</a> codec, which is one of the fastest open-source JPEG2000 codecs.</p>
 
-<p><a href="processors.html#ImageMagickProcessor">ImageMagickProcessor</a>'s JPEG2000 delegate, if installed, will also use the OpenJPEG library, but very inefficiently as the whole image is decompressed.</p>
-
-<p><a href="processors.html#GraphicsMagickProcessor">GraphicsMagickProcessor</a> can read and write JPEG2000 using the JasPer library, if the necessary plugin is installed, with the same caveats as ImageMagickProcessor.</p>
-
 <h3 id="TIFF">TIFF</h3>
 
 <p>TIFF is a common format, but there are some criteria that source images must meet in order to be delivered efficiently.</p>
@@ -159,8 +155,4 @@ title: Images
 
 <h2 id="Metadata">Metadata</h2>
 
-<p>Many image file formats are capable of storing supplementary technical and/or descriptive metadata alongside the actual image data. Formats may be able to store standard metadata formats like EXIF, IPTC IIM, and XMP, and they may also define their own metadata formats. More than one such format may be present even within the same file.</p>
-
-<p>When an image request is received&mdash;unless it calls for the full-sized unmodified source image&mdash;the image server will have to dynamically create and return a derivative image. As this is a whole new image, distinct from the source image, populating it with metadata would require an additional step.</p>
-
-<p>When <code>processor.metadata.preserve</code> is set to <code>true</code> in the configuration file, an effort will be made to copy metadata from source images into derivative images. This doesn't work with all processors; see the <a href="processors.html#Supported%20Features">Supported Features</a> table for a breakdown. It also does not generally work across formats.</p>
+<p>See <a href="metadata.html">Metadata</a>.</p>
