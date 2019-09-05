@@ -143,7 +143,7 @@ end
 
 <h3 id="Bypassing the Caches">Bypassing the Caches</h3>
 
-<p>The <a href="caching.html">caches</a> can be bypassed on a per-request basis by supplying a <code>cache=false</code> URL query argument. This bypasses the source, derivative, and info caches, and also omits any <code>Cache-Control</code> response header that may be configured, on a per-request basis. This is useful for testing and health checks.</p>
+<p>The <a href="caching.html">caches</a> can be bypassed on a per-request basis by supplying a <code>cache=nocache</code> (recommended) or <code>cache=false</code> (deprecated) URL query argument. This bypasses the source, derivative, and info caches, and also omits any <code>Cache-Control</code> response header that may be configured, on a per-request basis. This is useful for testing and health checks.</p>
 
 <h3 id="Processor-Specific Arguments">Processor-Specific Arguments</h3>
 
