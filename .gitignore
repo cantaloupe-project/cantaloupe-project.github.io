@@ -3,6 +3,7 @@
 Thumbs.db
 
 # Jekyll stuff
+.jekyll-cache
 .sass-cache
 _site
 
