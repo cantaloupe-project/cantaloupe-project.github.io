@@ -79,7 +79,12 @@ title: Remote Management
   </tr>
   <tr>
     <td>Expected Response Status</td>
-    <td><code>200 OK</code></td>
+    <td>
+      <ul>
+        <li><code>200 OK</code> for <code>GREEN</code> status</li>
+        <li><code>500 Internal Server Error</code> for all other statuses</li>
+      </ul>
+    </td>
   </tr>
   <tr>
     <td>Expected Response Content Type</td>
