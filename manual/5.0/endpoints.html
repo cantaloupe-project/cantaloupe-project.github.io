@@ -12,7 +12,7 @@ title: Endpoints
     <a href="#Additional%20Features">Additional Features</a>
     <ul>
       <li><a href="#Response%20Content%20Disposition">Response Content Disposition</a></li>
-      <li><a href="#Bypassing%20the%20Caches">Bypassing the Caches</a></li>
+      <li><a href="#Overriding%20Cache%20Behavior">Overriding Cache Behavior</a></li>
       <li><a href="#Processor-Specific%20Arguments">Processor-Specific Arguments</a></li>
     </ul>
   </li>
@@ -141,9 +141,16 @@ end
 
 <p>The value of the query argument must be URL-encoded. In this case, the decoded form looks like: <code>attachment; filename=image.jpg</code>.</p>
 
-<h3 id="Bypassing the Caches">Bypassing the Caches</h3>
+<h3 id="Overriding Cache Behavior">Overriding Cache Behavior</h3>
 
-<p>The <a href="caching.html">caches</a> can be bypassed on a per-request basis by supplying a <code>cache=nocache</code> (recommended) or <code>cache=false</code> (deprecated) URL query argument. This bypasses the source, derivative, and info caches, and also omits any <code>Cache-Control</code> response header that may be configured, on a per-request basis. This is useful for testing and health checks.</p>
+<p>The behavior of the <a href="caching.html">caches</a> can be overridden on a per-request basis by supplying a <code>cache</code> URL query argument with one of the following values:</p>
+
+<dl>
+  <dt><code>nocache</code> (or <code>false</code> [deprecated])</dt>
+  <dd>Completely bypasses the source, derivative, and info caches, and also omits any <code>Cache-Control</code> response header that may be configured.</dd>
+  <dt><code>recache</code></dt>
+  <dd>Bypasses the derivative and info caches when reading but not writing.</dd>
+</dl>
 
 <h3 id="Processor-Specific Arguments">Processor-Specific Arguments</h3>
 
