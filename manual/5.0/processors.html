@@ -478,6 +478,10 @@ title: Processors
 
 <p>This processor can read from files and streams. Seekable streams will be more efficient than sequential streams when working with pyramidal TIFF source images.</p>
 
+<p class="text-info">
+  <i class="fa fa-info-circle"></i> This processor relies the Image I/O JPEG plugin. This plugin implements the JFIF standard strictly and is known to fail to read certain images with error message such as, "Inconsistent metadata read from stream." If this turns out to be a problem, the recommended workaround, for the time being, is to use <a href="#TurboJpegProcessor">TurboJpegProcessor</a> instead.
+</p>
+
 <hr>
 
 <h3 id="JaiProcessor">JaiProcessor</h3>
