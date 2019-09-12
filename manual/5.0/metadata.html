@@ -195,7 +195,7 @@ end
 <h3 id="Implementation Notes">Implementation Notes</h3>
 
 <ul>
-  <li>After metadata is initially read from a source image, it may be <a href="caching.html#Derivative%20Cache">cached</a>, in which case subsequent requests will read it from the cache rather than the source image. In this case, changes to the source image's metadata will not be reflected in the application until the cached metadata becomes invalid and is re-read. If you need to change a source image's metadata, you should manually <a href="remote-management.html#PurgeItemFromCache">purge any cached content relating to it</a> afterwards.</li>
+  <li>After metadata is initially read from a source image, it may be <a href="caching.html#Derivative%20Cache">cached</a>, in which case subsequent requests will read it from the cache rather than the source image. In this case, changes to the source image's metadata will not be reflected in the application until the cached metadata becomes invalid and is re-read. If you need to change a source image's metadata, you should manually <a href="endpoints.html#PurgeItemFromCache">purge any cached content relating to it</a> afterwards.</li>
   <li>IPTC IIM supports many different character encodings, but Cantaloupe supports only UTF-8, ASCII, and ISO Latin 1, all of which get converted to UTF-8 internally.</li>
   <li>XMP sidecar files are not supported.</li>
 </ul>

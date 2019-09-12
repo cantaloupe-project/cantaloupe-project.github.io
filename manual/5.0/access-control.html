@@ -219,7 +219,7 @@ end
 
 <p><a href="https://iiif.io/api/auth/1.0/#tiered-access">Tiered Access</a> can be used to redirect to any of a number of &quot;virtual&quot; reduced-quality versions (&quot;tiers&quot;) of an image based on authorization status.</p>
 
-<p>The IIIF Authorization API is agnostic about how a quality tier system should work. Cantaloupe uses a resolution-based system that limits the maximum available resolution. For example, a fully-authorized user might be able to access the full resolution of an image, whereas an unauthorized user might be able to access only a half-resolution version.</p>
+<p>The IIIF Authorization API is indifferent about how a quality tier system should work. Cantaloupe uses a resolution-based system that limits the maximum available resolution. For example, a fully-authorized user might be able to access the full resolution of an image, whereas an unauthorized user might be able to access only a half-resolution version.</p>
 
 <p>This works transparently with zooming viewer clients, limiting the maximum available zoom level.</p>
 

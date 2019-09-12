@@ -98,7 +98,7 @@ cache.client.no_transform = true
 <ul>
   <li>Requests for full-sized, unaltered source images are not cached, and are instead streamed through with no processing.</li>
   <li>IIIF information response representations are not cached&mdash;only image info, which is the only expensive part to acquire. This means that other configuration options that would affect the contents of information responses can be changed without invalidating the cache.</li>
-  <li>Cached information includes image dimensions, tile dimensions, metadata, and maybe other properties. When the derivative cache is enabled, source images should not be modified in ways that would change any of these properties without their identifier also changing. If a source image needs to be changed, it should either receive a new identifier, or any cached info relating to it should be manually<a href="remote-management.html#PurgeItemFromCache">purged</a>.</li>
+  <li>Cached information includes image dimensions, tile dimensions, metadata, and maybe other properties. When the derivative cache is enabled, source images should not be modified in ways that would change any of these properties without their identifier also changing. If a source image needs to be changed, it should either receive a new identifier, or any cached info relating to it should be manually<a href="endpoints.html#PurgeItemFromCache">purged</a>.</li>
   <li>The derivative cache is shared across endpoints. Requests for the same image from different endpoints will return the same cached image.</li>
 </ul>
 
@@ -138,7 +138,7 @@ cache.client.no_transform = true
 
 <h3 id="Maintenance">Maintenance</h3>
 
-<p>Because cached content is not automatically deleted after becoming invalid, there will likely be a certain amount of invalid content taking up space in the cache at any given time. Without periodic maintenance, the amount can only grow. If this is a problem, it can be dealt with manually using the <a href="remote-management.html#HTTP%20API">HTTP API</a>, or automatically using the cache worker, which periodically purges invalid items. (See the <code>cache.server.worker.*</code> configuration options.)</p>
+<p>Because cached content is not automatically deleted after becoming invalid, there will likely be a certain amount of invalid content taking up space in the cache at any given time. Without periodic maintenance, the amount can only grow. If this is a problem, it can be dealt with manually using the <a href="endpoints.html#HTTP%20API">HTTP API</a>, or automatically using the cache worker, which periodically purges invalid items. (See the <code>cache.server.worker.*</code> configuration options.)</p>
 
 <hr>
 

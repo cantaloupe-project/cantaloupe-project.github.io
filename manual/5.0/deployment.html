@@ -50,7 +50,7 @@ title: Deployment & Tuning
 
 <h2 id="Health Checks">Health Checks</h2>
 
-<p>While the root path can be used for basic health checks, a dedicated health check endpoint that exercises more of the application is available as part of the <a href="remote-management.html#check-health">HTTP API</a>.</p>
+<p>While the root path can be used for basic health checks, a <a href="endpoints.html#Health%20Check">dedicated health check endpoint</a> that exercises more of the application is available.</p>
 
 <hr>
 
@@ -77,7 +77,7 @@ title: Deployment & Tuning
   <dd>Maximum heap size.</dd>
 </dl>
 
-<div class="alert alert-info"><i class="fa fa-info-circle"></i> These arguments aren't necessary in Docker, as JRE 8u191 introduced support for auto-detecting container CPU and memory settings.</div>
+<div class="alert alert-info"><i class="fa fa-info-circle"></i> These arguments aren't necessary in Docker when using JRE 8u191 or later, as that version introduced support for auto-detecting container CPU and memory settings.</div>
 
 <p>The commands in the <a href="getting-started.html">Getting Started</a> section specify a relatively small maximum heap size, and a production server may need larger.</p>
 
@@ -90,9 +90,9 @@ title: Deployment & Tuning
 
 <h4 id="MemoryGarbageCollection">Garbage Collection</h4>
 
-<p>In Java, heap memory is freed automatically by a garbage collector (GC) that runs in the JVM. One of the problems with garbage collection in Java is that it can cause periodic freezes of all applications running in the VM.</p>
+<p>Heap memory is freed automatically by a garbage collector (GC) that runs in the JVM. One of the problems with Java garbage collection in general is that it can cause periodic freezes of all applications running in the VM. Ideally the freezes are too short to notice, but sometimes that isn't the case.</p>
 
-<p>Over the years, the JVM's default GC implementation has changed from time to time as new GCs have been developed that try to reduce the pauses and improve the efficiency of garbage collection in general. Java 7 and 8 use the <a href="https://docs.oracle.com/javase/8/docs/technotes/guides/vm/gctuning/parallel.html">Parallel GC</a>. The <a href="https://www.oracle.com/technetwork/tutorials/tutorials-1876574.html">G1</a> GC became the default in Java 9. Java 11 introduced <a href="https://openjdk.java.net/jeps/333">ZGC</a> as an experimental new GC, and Java 12 introduced <a href="https://openjdk.java.net/jeps/189">Shenandoah</a> as another experimental GC. All of these GCs can be tried out by passing command-line arguments to the <code>java</code> invocation.</p>
+<p>Over the years, the JVM's default GC implementation has changed as new GCs have been developed that try to improve efficiency and reduce freezes. Java 7 and 8 use the <a href="https://docs.oracle.com/javase/8/docs/technotes/guides/vm/gctuning/parallel.html">Parallel GC</a>. The <a href="https://www.oracle.com/technetwork/tutorials/tutorials-1876574.html">G1</a> GC became the default in Java 9. Java 11 introduced <a href="https://openjdk.java.net/jeps/333">ZGC</a> as an experimental new GC, and Java 12 introduced <a href="https://openjdk.java.net/jeps/189">Shenandoah</a> as another experimental GC. All of these GCs can be experimented with by passing command-line arguments to the <code>java</code> invocation.</p>
 
 <h3 id="HardwareStorage">Storage</h3>
 
@@ -111,10 +111,10 @@ title: Deployment & Tuning
 <h2 id="Limiting">Limiting</h2>
 
 <ul>
-  <li>Setting the <code>max_scale</code> configuration option to <code>1.0</code> will disallow requests for larger scales that could overwhelm the server.</li>
+  <li>The <code>max_scale</code> configuration option can be used to disallow requests for large scales that could overwhelm the server.</li>
   <li>A <code>max_pixels</code> configuration option is available to limit the maximum returned size of processed images. This is a "safety net" to prevent excessively expensive requests. It does not affect requests for full-sized unmodified images, which do not significantly load the server.
     <ul>
-      <li>Note that the <code><a href="access-control.html#Authorization">authorize()</a></code> delegate method can perform the same function as <code>max_pixels</code>, with more granular control.</li>
+      <li>Note that the <code><a href="access-control.html#Authorization">authorize()</a></code> delegate method can play the same role as <code>max_pixels</code>, with more granular control.</li>
     </ul>
   </li>
 </ul>
@@ -169,7 +169,7 @@ title: Deployment & Tuning
   </tr>
 </table>
 
-<p>If the proxy cannot be configured to send the <code>X-Forwarded-*</code> headers, the <code>base_uri</code> configuration option can be used instead; set it to the URI of the client-facing reverse proxy including any base path.</p>
+<p>If the proxy cannot be configured to send the <code>X-Forwarded</code> headers, the <code>base_uri</code> configuration option can be used instead; set it to the URI of the client-facing reverse proxy including any base path.</p>
 
 <p>In a reverse-proxying scenario, consider disabling the <a href="logging.html#Access%20Log">access log</a>, if it would be redundant.</p>
 
