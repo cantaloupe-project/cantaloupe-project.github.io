@@ -20,22 +20,7 @@ title: Overlays
 
 <p>The overlay feature overlays an image or text string on top of a derivative (output) image. This can be useful for description, branding, attribution, copyright notices, and so on.</p>
 
-<figure>
-  <img src="images/string-overlay-1600.jpg" class="img img-fluid" alt="Image with string overlay applied.">
-  <figcaption>String overlay</figcaption>
-</figure>
-
-<figure>
-  <img src="images/image-overlay-1600.jpg" class="img img-fluid" alt="Image with image overlay applied.">
-  <figcaption>Image overlay</figcaption>
-</figure>
-
-<figure>
-  <img src="images/image-repeat-overlay-1600.jpg" class="img img-fluid" alt="Image with repeating image overlay applied.">
-  <figcaption>Repeating image overlay</figcaption>
-</figure>
-
-<p>With both types of overlays, the position, inset, and output width/height threshold (below which the overlay won't be displayed) are configurable.</p>
+<p>With all types of overlays, the position, inset, and output width/height threshold (below which the overlay won't be displayed) are configurable.</p>
 
 <p>Not all processors support overlays; see the <a href="processors.html#Supported%20Features">table of supported features</a>.</p>
 
@@ -58,6 +43,30 @@ title: Overlays
   </a>
 </p>
 
+<figure>
+  <img src="images/image-overlay-1600.jpg" class="img img-fluid" alt="Image with image overlay applied.">
+  <code><pre>overlays.strategy = BasicStrategy
+overlays.BasicStrategy.type = image
+overlays.BasicStrategy.image = /path/to/image.png
+overlays.BasicStrategy.position = bottom right</pre></code>
+</figure>
+
+<figure>
+  <img src="images/image-repeat-overlay-1600.jpg" class="img img-fluid" alt="Image with repeating image overlay applied.">
+  <code><pre>overlays.strategy = BasicStrategy
+overlays.BasicStrategy.type = image
+overlays.BasicStrategy.image = /path/to/image.png
+overlays.BasicStrategy.position = repeat</pre></code>
+</figure>
+
+<figure>
+  <img src="images/image-scaled-overlay-1600.jpg" class="img img-fluid" alt="Image with scaled image overlay applied.">
+  <code><pre>overlays.strategy = BasicStrategy
+overlays.BasicStrategy.type = image
+overlays.BasicStrategy.image = /path/to/image.png
+overlays.BasicStrategy.position = scaled</pre></code>
+</figure>
+
 <hr>
 
 <h2 id="String Overlays">String Overlays</h2>
@@ -67,6 +76,17 @@ title: Overlays
 <p>Line breaks within the string (<code>\n</code>) are respected, enabling multi-line strings. Each line is auto-aligned to the edge of the image according to the <a href="#Positioning">overlay position</a>.</p>
 
 <p>Strings will never overflow the image. When a string doesn't fit entirely inside at its specified font size, the application will try to use the largest font size that fits, down to the configurable minimum allowed size. If none fit, the string won't be drawn.</p>
+
+<figure>
+  <img src="images/string-overlay-1600.jpg" class="img img-fluid" alt="Image with string overlay applied.">
+  <code><pre>overlays.strategy = BasicStrategy
+overlays.BasicStrategy.type = string
+overlays.BasicStrategy.string = McKinley Marina\nMilwaukee, Wisconsin, USA
+overlays.BasicStrategy.string.color = white
+overlays.BasicStrategy.string.background.color = rgba(0,0,0,0.5)
+overlays.BasicStrategy.position = bottom left
+overlays.BasicStrategy.inset = 10</pre></code>
+</figure>
 
 <hr>
 
@@ -137,9 +157,7 @@ end
 
 <h2 id="Positioning">Positioning</h2>
 
-<p>Position and inset are configurable. Supported positions are <code>top left</code>, <code>top center</code>, <code>top right</code>, <code>left center</code>, <code>center</code>, <code>right center</code>, <code>bottom left</code>, <code>bottom center</code>, <code>bottom right</code>, and <code>repeat</code>.</p>
-
-<p><code>repeat</code> works only with image overlays, drawing the overlay image in a grid pattern over the whole image. This position does not support an inset.</p>
+<p>Position and inset are configurable. Supported positions are <code>top left</code>, <code>top center</code>, <code>top right</code>, <code>left center</code>, <code>center</code>, <code>right center</code>, <code>bottom left</code>, <code>bottom center</code>, and <code>bottom right</code>. Image overlays also support <code>repeat</code> and <code>scaled</code>. All positions except <code>repeat</code> support an inset.</p>
 
 <hr>
 
@@ -154,8 +172,7 @@ end
     {% highlight ruby %}
 class CustomDelegate
   def overlay(options = {})
-    crop = context['operations'].find{ |op| op['class'].include?('Crop') }
-    return nil if crop
+    return nil if context['operations'].find{ |op| op['class'].include?('Crop') }
     # ...
   end
 end
