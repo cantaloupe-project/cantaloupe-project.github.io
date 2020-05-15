@@ -272,7 +272,7 @@ end
 
 <h3 id="HttpSource">HttpSource</h3>
 
-<p>HttpSource maps a URL identifier to an HTTP or HTTPS resource, for retrieving images from a remote web server. It uses a <a href="http://www.eclipse.org/jetty/documentation/current/http-client.html">Jetty HTTP client</a> internally.</p>
+<p>HttpSource maps a URL identifier to an HTTP or HTTPS resource, for retrieving images from a remote web server. It uses an <a href="https://square.github.io/okhttp/">OkHttp client</a> internally.</p>
 
 <h4>Lookup Strategies</h4>
 
@@ -345,6 +345,11 @@ HttpSource.BasicLookupStrategy.url_suffix =
 </ol>
 
 <p>Note that when chunking is in effect, the <code>processor.stream_retrieval_strategy</code> configuration key is ignored, effectively behaving as if it were set to <code>StreamStrategy</code>. (See <a href="processors.html#Retrieval%20Strategies">Retrieval Strategies</a>.) Chunking is meant to obviate the expense of the other strategies.</p>
+
+<div class="alert alert-info">
+  <i class="fa fa-info-circle"></i>
+  The HTTP client library used by this source changed in version 5.0. The old client (Jetty) used <code>$JAVA_HOME/jre/lib/security/cacerts</code> as its trust store, whereas the new client (OkHttp) uses the value of the <code>javax.net.ssl.trustStore</code> VM argument. After migrating from 4.1, if you encounter errors like, "PKIX path building failed," try setting the value of that VM argument to the aforementioned path, or the path of some other trust store.
+</div>
 
 <hr>
 
