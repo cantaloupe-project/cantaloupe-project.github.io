@@ -117,6 +117,7 @@ title: Deployment & Tuning
       <li>Note that the <code><a href="access-control.html#Authorization">authorize()</a></code> delegate method can play the same role as <code>max_pixels</code>, with more granular control.</li>
     </ul>
   </li>
+  <li>In standalone mode, <code>http.min_threads</code>, <code>http.max_threads</code>, and <code>http.accept_queue_limit</code> can be used to adjust the characteristics of the built-in web server's request thread pool and queue. When any of the values are exceeded, the application will refuse to fulfill requests by returning <code>HTTP 503 Service Unavailable</code>.</li>
 </ul>
 
 <hr>
