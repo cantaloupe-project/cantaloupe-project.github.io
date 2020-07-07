@@ -10,8 +10,7 @@ title: Getting Started
   <li><a href="#Configuration">Configuration</a></li>
   <li><a href="#Running">Running</a>
     <ul>
-      <li><a href="#Standalone">Standalone</a></li>
-      <li><a href="#Servlet%20Container">Servlet Container</a></li>
+      <li><a href="#Command%20Line">Command Line</a></li>
       <li><a href="#Docker">Docker</a></li>
     </ul>
   </li>
@@ -34,11 +33,9 @@ title: Getting Started
 
 <h2 id="Running">Running</h2>
 
-<p>The application is distributed as a custom WAR file that can be run standalone, using a built-in web server, or deployed to a Servlet container like Tomcat. If you have a choice, standalone mode is recommended, as it's a more controlled environment that is less prone to conflicting with other applications. If you do choose to run other applications in the same container, be sure to test them all to ensure they are working correctly.</p>
+<h3 id="Command Line">Command Line</h3>
 
-<h3 id="Standalone">Standalone</h3>
-
-<p>From a command prompt:</p>
+<p>From a command prompt, invoke one of the commands below. The first command is shorter while the second can be used to modify the classpath:</p>
 
 <ul class="nav nav-pills" role="tablist">
   <li class="nav-item">
@@ -50,10 +47,12 @@ title: Getting Started
 </ul>
 <div class="tab-content">
   <div class="tab-pane fade show active" id="run-linux1" role="tabpanel" aria-labelledby="run-linux-tab1">
-    <pre>java -Dcantaloupe.config=/path/to/cantaloupe.properties -Xmx2g -jar cantaloupe-<span class="version">5.0</span>.x.war</pre>
+    <pre>java -Dcantaloupe.config=/path/to/cantaloupe.properties -Xmx2g -jar cantaloupe-<span class="version">5.0</span>.x.jar</pre>
+    <pre>java -cp cantaloupe-<span class="version">5.0</span>.jar -Dcantaloupe.config=/path/to/cantaloupe.properties -Xmx2g edu.illinois.library.cantaloupe.StandaloneEntry</pre>
   </div>
   <div class="tab-pane fade" id="run-windows1" role="tabpanel" aria-labelledby="run-windows-tab1">
-    <pre>java -Dcantaloupe.config=C:\path\to\cantaloupe.properties -Xmx2g -jar cantaloupe-<span class="version">5.0</span>.x.war</pre>
+    <pre>java -Dcantaloupe.config=C:\path\to\cantaloupe.properties -Xmx2g -jar cantaloupe-<span class="version">5.0</span>.x.jar</pre>
+    <pre>java -cp cantaloupe-<span class="version">5.0</span>.jar -Dcantaloupe.config=C:\path\to\cantaloupe.properties -Xmx2g edu.illinois.library.cantaloupe.StandaloneEntry</pre>
   </div>
 </div>
 
@@ -65,40 +64,6 @@ title: Getting Started
 </ul>
 
 <p>The <code>-Xmx2g</code> argument tells the JVM that it can use a maximum of 2 GB of heap space, which should be more than enough for evaluation purposes, but maybe not for production&mdash;see <a href="deployment.html#HardwareMemory">Memory Considerations</a>.</p>
-
-<h3 id="Servlet Container">Servlet Container</h3>
-
-<p>Copy the <span class="filename">cantaloupe-<span class="version">5.0</span>.x.war</span> file to your container's web application folder. (In Tomcat, this is <span class="filename">/webapps</span> inside the main Tomcat folder.)</p>
-
-<ul class="nav nav-pills" role="tablist">
-  <li class="nav-item">
-    <a class="nav-link active" id="run-linux-tab2" data-toggle="tab" href="#run-linux2" role="tab" aria-controls="home" aria-selected="true">macOS/Linux</a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link" id="run-windows-tab2" data-toggle="tab" href="#run-windows2" role="tab" aria-controls="profile" aria-selected="false">Windows</a>
-  </li>
-</ul>
-<div class="tab-content">
-  <div class="tab-pane fade show active" id="run-linux2" role="tabpanel" aria-labelledby="run-linux-tab2">
-    <p>Add the <code>-Dcantaloupe.config</code> VM argument to your container, in the same format as in the <a href="#Standalone">standalone</a> section. In Tomcat 8, this can be done by setting <code>CATALINA_OPTS</code>, located in <span class="filename">bin/setenv.sh</span> inside the main Tomcat folder:</p>
-
-    <pre>export CATALINA_OPTS="$CATALINA_OPTS -Dcantaloupe.config=/path/to/cantaloupe.properties"</pre>
-  </div>
-  <div class="tab-pane fade" id="run-windows2" role="tabpanel" aria-labelledby="run-windows-tab2">
-    <p>Add the <code>-Dcantaloupe.config</code> VM argument to your container, in the same format as in the <a href="#Standalone">standalone</a> section. In Tomcat 8, this can be done by setting <code>CATALINA_OPTS</code>, located in <span class="filename">bin/setenv.bat</span> inside the main Tomcat folder:</p>
-
-    <pre>set JAVA_OPTS=%JAVA_OPTS% -Dcantaloupe.config="C:\path\to\cantaloupe.properties"</pre>
-  </div>
-</div>
-
-<p>Then, restart your container.</p>
-
-<p>Assuming you have an image named <span class="filename">image.tif</span>, and a container listening on port 8080, try accessing:</p>
-
-<ul>
-  <li>http://localhost:8080/cantaloupe-<span class="version">5.0</span>.x/iiif/2/image.tif/info.json</li>
-  <li>http://localhost:8080/cantaloupe-<span class="version">5.0</span>.x/iiif/2/image.tif/0,0,200,200/full/0/default.jpg</li>
-</ul>
 
 <h3 id="Docker">Docker</h3>
 
