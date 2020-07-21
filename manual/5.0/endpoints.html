@@ -44,7 +44,6 @@ title: Endpoints
           <li><a href="#PurgeInvalidFromCache">Purge invalid/expired content from all caches</a></li>
           <li><a href="#PurgeItemFromCache">Purge all content relating to an individual source image from all caches</a></li>
           <li><a href="#PurgeCache">Purge all content from all caches</a></li>
-          <li><a href="#PurgeDelegateMethodInvocationCache">Purge the delegate method invocation cache</a></li>
           <li><a href="#PurgeInfoCache">Purge the info cache</a>
         </ul>
       </li>
@@ -388,33 +387,6 @@ end
     <td>Request Body</td>
     <td>{% highlight json %}{
   "verb" : "PurgeCache"
-}{% endhighlight %}</td>
-  </tr>
-  <tr>
-    <td>Expected Response</td>
-    <td><code>204 Accepted</code> with task URI in <code>Location</code> header</td>
-  </tr>
-</table>
-
-<h4 id="PurgeDelegateMethodInvocationCache">Purge the delegate method invocation cache</h4>
-
-<table class="table table-bordered">
-  <tr>
-    <td>Request Method</td>
-    <td><code>POST</code></td>
-  </tr>
-  <tr>
-    <td>URI</td>
-    <td><span class="filename">/tasks</span></td>
-  </tr>
-  <tr>
-    <td>Request Content Type</td>
-    <td><code>application/json</code></td>
-  </tr>
-  <tr>
-    <td>Request Body</td>
-    <td>{% highlight json %}{
-  "verb" : "PurgeDelegateMethodInvocationCache"
 }{% endhighlight %}</td>
   </tr>
   <tr>

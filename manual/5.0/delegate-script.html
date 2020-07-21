@@ -20,7 +20,6 @@ title: Delegate Script
     <ul>
       <li><a href="#Sharing%20Information">Sharing Information</a></li>
       <li><a href="#Connection Pooling">Connection Pooling</a></li>
-      <li><a href="#Caching">Caching</a></li>
     </ul>
   </li>
   <li><a href="#Logging">Logging</a></li>
@@ -197,18 +196,6 @@ end
   <li>Supply a third-party connection pooling library as a JAR;</li>
   <li>Write your own connection pool</li>
 </ol>
-
-<h3 id="Caching">Caching</h3>
-
-<p>The <code>delegate_script.cache.enabled</code> option is available to cache the results of delegate method invocations. The cache is an in-memory least-recently-used (LRU) cache with infinite time-to-live and a maximum size auto-computed based on the maximum JVM heap size. When the limit is approached, the oldest invocations will be purged automatically.</p>
-
-<p>The invocation cache can also be purged manually using the <a href="endpoints.html#HTTP%20API">HTTP API</a>.</p>
-
-<p>The cache is not persisted. It will be lost when the application is stopped.</p>
-
-<p>Cached invocations are <strong>not</strong> purged when the script file is auto-reloaded, such as in response to a change. If, while the application is running, you modify the script file in a way that would cause a return value to be different based on the same request context, you should either purge the invocation cache or restart.</p>
-
-<hr>
 
 <h2 id="Logging">Logging</h2>
 
