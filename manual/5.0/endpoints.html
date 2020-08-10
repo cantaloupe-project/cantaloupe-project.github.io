@@ -8,6 +8,7 @@ title: Endpoints
 <ul class="toc">
   <li><a href="#Image%20Endpoints">Image Endpoints</a>
     <ul>
+      <li><a href="#IIIFImageAPI3">IIIF Image API 3</a></li>
       <li><a href="#IIIFImageAPI2">IIIF Image API 2</a></li>
       <li><a href="#IIIFImageAPI1">IIIF Image API 1</a></li>
       <li>
@@ -53,13 +54,71 @@ title: Endpoints
 
 <h2 id="Image Endpoints">Image Endpoints</h2>
 
+<h3 id="IIIFImageAPI3">IIIF Image API 3</h3>
+
+<h4>Documentation</h4>
+
+<ul>
+  <li><a href="https://iiif.io/api/image/3.0/">IIIF Image API 3.0</a></li>
+</ul>
+
+<h4>Location</h4>
+
+<p>This endpoint is available at <span class="filename">/iiif/3</span>.</p>
+
+<h4>Enabling/Disabling</h4>
+
+<p>This endpoint can be enabled or disabled using the <code>endpoint.iiif.3.enabled</code> configuration key.</p>
+
+<h4>Compliance</h4>
+
+<p>Version 3.0 of this API is implemented at a <a href="https://iiif.io/api/image/3.0/compliance/">compliance level</a> of 2.</p>
+
+<h4>Information Response Notes</h4>
+
+<dl>
+  <dt><code>sizes</code></dt>
+  <dd>An array of width/height pairs according to the formula <i>dimension * 1/2<sup>n</sup> &gt; <code>endpoint.iiif.min_size</code></i>. (To restrict access to only these sizes, use the <code>endpoint.iiif.restrict_to_sizes</code> configuration option.)</dd>
+  <dt><code>tiles</code></dt>
+  <dd>Contains a tile size that will be relatively efficient to deliver, along with a list of scale factors at which each size is available.
+    <ul>
+      <li>For images that are natively tiled, the <code>width</code> and <code>height</code> are a multiple of the native tile dimensions no smaller than the value of the <code>endpoint.iiif.min_tile_size</code> configuration key.</li>
+      <li>For untiled images, they are based on the <code>endpoint.iiif.min_tile_size</code> configuration key.</li>
+    </ul>
+  </dd>
+  <dt><code>maxArea</code></dt>
+  <dd>This value reflects the settings of <code>max_pixels</code> and <code>max_scale</code>.</dd>
+</dl>
+
+<h5 id="Additional Information Response Keys">Additional Information Response Keys</h5>
+
+<p>Custom keys can be added to the information JSON response, such as to declare <a href="https://iiif.io/api/annex/services/">service profiles</a> or add a <a href="https://iiif.io/api/image/3.0/#56-rights">rights statement</a>. The <a href="delegate-script.html">delegate script</a> needs to implement the <code>extra_iiif3_information_response_keys()</code> method. An example implementation follows:</p>
+
+{% highlight ruby %}
+class CustomDelegate
+  def extra_iiif3_information_response_keys(options = {})
+    {
+      'rights' => 'http://example.org/license.html',
+      'service' => [
+        {
+          '@id': 'https://example.org/auth/login',
+          '@type': 'AuthCookieService1',
+          'profile': 'http://iiif.io/api/auth/1/login',
+          'label': 'Log In'
+        }
+      ]
+    }
+  end
+end
+{% endhighlight %}
+
 <h3 id="IIIFImageAPI2">IIIF Image API 2</h3>
 
 <h4>Documentation</h4>
 
 <ul>
-  <li><a href="http://iiif.io/api/image/2.0/">IIIF Image API 2.0</a></li>
-  <li><a href="http://iiif.io/api/image/2.1/">IIIF Image API 2.1</a></li>
+  <li><a href="https://iiif.io/api/image/2.0/">IIIF Image API 2.0</a></li>
+  <li><a href="https://iiif.io/api/image/2.1/">IIIF Image API 2.1</a></li>
 </ul>
 
 <h4>Location</h4>
@@ -72,13 +131,13 @@ title: Endpoints
 
 <h4>Compliance</h4>
 
-<p>Version 2.1.1 of this API is implemented. <a href="http://iiif.io/api/image/2.1/compliance/">Compliance level</a> is dynamically computed and declared on a per-processor basis. Most processors are "Level 2"-compliant.</p>
+<p>Version 2.1.1 of this API is implemented. <a href="https://iiif.io/api/image/2.1/compliance/">Compliance level</a> is dynamically computed and declared on a per-processor basis. Most processors are "Level 2"-compliant.</p>
 
 <h4>Information Response Notes</h4>
 
 <dl>
   <dt><code>sizes</code></dt>
-  <dd>An array of width/height pairs according to the formula <i>dimension * 1/2<sup>n</sup> &gt; <code>endpoint.iiif.min_size</code></i>. (To restrict access to only these sizes, use the <code>endpoint.iiif.2.restrict_to_sizes</code> configuration option.)</dd>
+  <dd>An array of width/height pairs according to the formula <i>dimension * 1/2<sup>n</sup> &gt; <code>endpoint.iiif.min_size</code></i>. (To restrict access to only these sizes, use the <code>endpoint.iiif.restrict_to_sizes</code> configuration option.)</dd>
   <dt><code>tiles</code></dt>
   <dd>Contains a tile size that will be relatively efficient to deliver, along with a list of scale factors at which each size is available.
     <ul>
@@ -100,21 +159,21 @@ title: Endpoints
 
 <h5 id="Additional Information Response Keys">Additional Information Response Keys</h5>
 
-<p>Custom keys can be added to the information JSON response, such as to declare <a href="http://iiif.io/api/annex/services/">service profiles</a> or, beginning in Image API 2.1, an optional rights statement and/or logo. The <a href="delegate-script.html">delegate script</a> needs to implement the <code>extra_iiif2_information_response_keys()</code> method. An example implementation follows:</p>
+<p>Custom keys can be added to the information JSON response, such as to declare <a href="https://iiif.io/api/annex/services/">service profiles</a> or, beginning in Image API 2.1, an optional rights statement and/or logo. The <a href="delegate-script.html">delegate script</a> needs to implement the <code>extra_iiif2_information_response_keys()</code> method. An example implementation follows:</p>
 
 {% highlight ruby %}
 class CustomDelegate
   def extra_iiif2_information_response_keys(options = {})
     {
-        'attribution' => 'Copyright My Great Organization. All rights reserved.',
-        'license' => 'http://example.org/license.html',
-        'logo' => 'http://example.org/logo.png',
-        'service' => {
-            '@context' => 'http://iiif.io/api/annex/services/physdim/1/context.json',
-            'profile' => 'http://iiif.io/api/annex/services/physdim',
-            'physicalScale' => 0.0025,
-            'physicalUnits' => 'in'
-        }
+      'attribution' => 'Copyright My Great Organization. All rights reserved.',
+      'license' => 'http://example.org/license.html',
+      'logo' => 'http://example.org/logo.png',
+      'service' => {
+        '@context' => 'http://iiif.io/api/annex/services/physdim/1/context.json',
+        'profile' => 'http://iiif.io/api/annex/services/physdim',
+        'physicalScale' => 0.0025,
+        'physicalUnits' => 'in'
+      }
     }
   end
 end
@@ -125,8 +184,8 @@ end
 <h4>Documentation</h4>
 
 <ul>
-  <li><a href="http://iiif.io/api/image/1.0/">IIIF Image API 1.0</a></li>
-  <li><a href="http://iiif.io/api/image/1.1/">IIIF Image API 1.1</a></li>
+  <li><a href="https://iiif.io/api/image/1.0/">IIIF Image API 1.0</a></li>
+  <li><a href="https://iiif.io/api/image/1.1/">IIIF Image API 1.1</a></li>
 </ul>
 
 <h4>Location</h4>
