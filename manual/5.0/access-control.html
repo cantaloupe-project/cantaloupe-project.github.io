@@ -6,6 +6,7 @@ title: Access Control
 <h1>Access Control</h1>
 
 <ul class="toc">
+  <li><a href="#Delegate%20Methods">Delegate Methods</a></li>
   <li><a href="#Authorization%20Examples">Examples</a>
     <ul>
       <li><a href="#example-2">Allow only requests for half-scale images or smaller</a></li>
@@ -29,9 +30,16 @@ title: Access Control
 
 </ul>
 
-<p>The <code>authorize()</code> <a href="delegate-script.html">delegate method</a> can be used to implement authorization logic ranging from simple to complex. A skeleton with documented parameters and return values is present in the <span class="filename">delegates.rb.sample</span> file. By default, it just returns <code>true</code>, authorizing all requests.</p>
+<h2 id="Delegate Methods">Delegate Methods</h2>
 
-<p class="text-info"><i class="fa fa-info-circle"></i> The authorization method will be called upon every request to a public endpoint, and should therefore be written to be efficient.</p>
+<p>The <a href="delegate-script.html">delegate script</a> can be used to implement authorization logic ranging from simple to complex. The <span class="filename">delegates.rb.sample</span> file contains two delegate methods&mdash;<code>pre_authorize()</code> and <code>authorize()</code>&mdash;along with documentation of how they work. By default, they both return <code>true</code>, authorizing all requests.</p>
+
+<p><code>pre_authorize()</code> is a new method in version 5.0. It is called upon all requests to all public endpoints early in the request cycle, before any image has been accessed. This means that it cannot be used to implement authorization policy that depends on information about the source image. However, because it is invoked early, it <strong>should</strong> be used to implement all other authorization logic.</p>
+
+<p><code>authorize()</code> is invoked later in the request cycle, after <code>pre_authorize()</code> has returned <code>true</code>, and once information is available about the source image. When authorization policy does not depend on this information, this method should just return <code>true</code>.</p>
+
+<p class="text-info"><i class="fa fa-info-circle"></i> <code>authorize()</code> is only invoked for image requests&mdash;not information requests, or any other type of request.</p>
+
 <p class="text-info"><i class="fa fa-info-circle"></i> Implementations should assume that the underlying source image exists. The existence check will happen separately.</p>
 
 <h2 id="Authorization Examples">Examples</h2>
@@ -40,6 +48,10 @@ title: Access Control
 
 {% highlight ruby %}
 class CustomDelegate
+  def pre_authorize(options = {})
+    true
+  end
+
   def authorize(options = {})
     scale = context['operations'].find{ |op| op['class'] == 'Scale' }
     if scale
@@ -56,15 +68,18 @@ end
 
 {% highlight ruby %}
 class CustomDelegate
-  def authorize(options = {})
+  def pre_authorize(options = {})
     identifier = context['identifier']
-
     # Allow only identifiers that don't include "_restricted"
     return !identifier.include?('_restricted')
     # Allow only identifiers that start with "_public"
     return identifier.start_with?('public_')
     # Allow only identifiers matching a regex
     return identifier.match(/^image[5-9][0-9]/)
+  end
+
+  def authorize(options = {})
+    true
   end
 end
 {% endhighlight %}
@@ -73,8 +88,12 @@ end
 
 {% highlight ruby %}
 class CustomDelegate
-  def authorize(options = {})
+  def pre_authorize(options = {})
     context['output_format'] == 'image/jpeg'
+  end
+
+  def authorize(options = {})
+    true
   end
 end
 {% endhighlight %}
@@ -85,10 +104,14 @@ end
 
 {% highlight ruby %}
 class CustomDelegate
-  def authorize(options = {})
+  def pre_authorize(options = {})
     headers = context['request_headers']
     agent = headers.find{ |h, v| h.downcase == 'user-agent' }
     agent.start_with?('MyAllowedUserAgent/')
+  end
+
+  def authorize(options = {})
+    true
   end
 end
 {% endhighlight %}
@@ -97,8 +120,12 @@ end
 
 {% highlight ruby %}
 class CustomDelegate
-  def authorize(options = {})
+  def pre_authorize(options = {})
     headers['X-MyToken'] == ... # write code to authorize the token
+  end
+
+  def authorize(options = {})
+    true
   end
 end
 {% endhighlight %}
@@ -111,6 +138,10 @@ end
 
 {% highlight ruby %}
 class CustomDelegate
+  def pre_authorize(options = {})
+    true
+  end
+
   def authorize(options = {})
     crop = context['operations'].find{ |op| op['class'] == 'Crop' }
     if crop
@@ -134,7 +165,7 @@ end
 require 'base64'
 
 class CustomDelegate
-  def authorize(options = {})
+  def pre_authorize(options = {})
     header = context['request_headers']
                  .select{ |name, value| name.downcase == 'authorization' }
                  .values.first
@@ -143,7 +174,10 @@ class CustomDelegate
         'status_code' => 401,
         'challenge' => 'Basic realm="MyRealm" charset="UTF-8"'
     }
+  end
 
+  def authorize(options = {})
+    true
   end
 
   def authenticate_basic(header)
@@ -167,11 +201,15 @@ end
 
 {% highlight ruby %}
 class CustomDelegate
-  def authorize(options = {})
+  def pre_authorize(options = {})
     {
       'status_code' => 303, # "See Other"
       'location' => 'http://example.org/some-other-url'
     }
+  end
+
+  def authorize(options = {})
+    true
   end
 end
 {% endhighlight %}
@@ -199,7 +237,7 @@ end
 
 {% highlight ruby %}
 class CustomDelegate
-  def authorize(options = {})
+  def pre_authorize(options = {})
     header = context['request_headers']
                  .select{ |name, value| name.downcase == 'authorization' }
                  .values.first
@@ -211,6 +249,10 @@ class CustomDelegate
         'status_code' => 401,
         'challenge' => 'Bearer charset="UTF-8"'
     }
+  end
+
+  def authorize(options = {})
+    true
   end
 end
 {% endhighlight %}
@@ -233,7 +275,7 @@ class CustomDelegate
   # The maximum scale allowed to unauthorized clients.
   MAX_UNAUTHORIZED_R = Rational(1, 2)
 
-  def authorize(options = {})
+  def pre_authorize(options = {})
     header = context['request_headers']
                  .select{ |name, value| name.downcase == 'authorization' }
                  .values.first
@@ -268,6 +310,10 @@ class CustomDelegate
         'status_code' => 401,
         'challenge' => 'Bearer charset="UTF-8"'
     }
+  end
+
+  def authorize(options = {})
+    true
   end
 
   def valid?(token)

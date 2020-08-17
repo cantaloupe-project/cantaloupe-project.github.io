@@ -114,7 +114,7 @@ title: Deployment & Tuning
   <li>The <code>max_scale</code> configuration option can be used to disallow requests for large scales that could overwhelm the server.</li>
   <li>A <code>max_pixels</code> configuration option is available to limit the maximum returned size of processed images. This is a "safety net" to prevent excessively expensive requests. It does not affect requests for full-sized unmodified images, which do not significantly load the server.
     <ul>
-      <li>Note that the <code><a href="access-control.html#Authorization">authorize()</a></code> delegate method can play the same role as <code>max_pixels</code>, with more granular control.</li>
+      <li>Note that the <a href="access-control.html#Delegate%20Methods">authorization-related delegate methods</a> can play the same role as <code>max_pixels</code>, with more granular control.</li>
     </ul>
   </li>
   <li>In standalone mode, <code>http.min_threads</code>, <code>http.max_threads</code>, and <code>http.accept_queue_limit</code> can be used to adjust the characteristics of the built-in web server's request thread pool and queue. When any of the values are exceeded, the application will refuse to fulfill requests by returning <code>HTTP 503 Service Unavailable</code>.</li>

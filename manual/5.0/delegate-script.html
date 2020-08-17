@@ -10,6 +10,7 @@ title: Delegate Script
   <li><a href="#How%20It%20Works">How It Works</a></li>
   <li><a href="#Migrating">Migrating</a>
     <ul>
+      <li><a href="#MigratingFrom41To5">From the 4.1 Script to the 5.0 Script</a></li>
       <li><a href="#MigratingFrom4To41">From the 4.0 Script to the 4.1 Script</a></li>
       <li><a href="#MigratingFrom3To4">From the 3.x Script to the 4.0 Script</a></li>
     </ul>
@@ -64,6 +65,10 @@ title: Delegate Script
 <hr>
 
 <h2 id="Migrating">Migrating</h2>
+
+<h3 id="MigratingFrom41To5">From the 4.1 Script to the 5.0 Script</h3>
+
+<p>In version 5.0, a new method named <code>pre_authorize()</code> was added. In many cases, the <code>authorize()</code> implementation can simply be moved into this new method, unless it contains logic that depends on information read from the underlying source image. See the sample delegate script, as well as the <a href="access-control.html#Delegate%20Script">Access Control</a> section, for more information.</p>
 
 <h3 id="MigratingFrom4To41">From the 4.0 Script to the 4.1 Script</h3>
 
