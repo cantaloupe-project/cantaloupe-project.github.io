@@ -89,7 +89,7 @@ title: Sources
 
 <h3 id="Dynamic Sources">Dynamic Sources</h3>
 
-<p>When a static source is not flexible enough, it is also possible to serve images from different sources from the same application instance. For example, you may have some images stored on a filesystem, and others stored in an S3 bucket. <em>If you can differentiate their sources based on their identifier in code</em>&mdash;either by analyzing the identifier string, or performing some kind of service request&mdash;you can write a <a href="delegate-script.html">delegate method</a> to tell the image server which source to use for a given request.</p>
+<p>When a static source is not flexible enough, it is also possible to serve images from different sources from the same application instance. For example, you may have some images stored on a filesystem, and others stored in an S3 bucket. <em>If you can differentiate their sources based on their identifier in code</em>&mdash;either by analyzing the identifier string, or performing some kind of service request&mdash;you can write a <a href="delegate-system.html">delegate method</a> to tell the image server which source to use for a given request.</p>
 
 <p>To enable dynamic source selection, set the <code>source.delegate</code> configuration key to <code>true</code>, and implement the <code>source()</code> delegate method. For example:</p>
 
@@ -189,7 +189,7 @@ FilesystemSource.BasicLookupStrategy.path_suffix =
 
 <h5 id="FilesystemSourceScriptLookupStrategy">ScriptLookupStrategy</h5>
 
-<p>Sometimes, BasicLookupStrategy will not offer enough control. Perhaps you want to serve images from multiple filesystems, or perhaps your identifiers are opaque and you need to perform a database or web service request to locate the corresponding images. With this lookup strategy, you can tell FilesystemSource to invoke a <a href="delegate-script.html">delegate method</a> and capture the pathname it returns.</p>
+<p>Sometimes, BasicLookupStrategy will not offer enough control. Perhaps you want to serve images from multiple filesystems, or perhaps your identifiers are opaque and you need to perform a database or web service request to locate the corresponding images. With this lookup strategy, you can tell FilesystemSource to invoke a <a href="delegate-system.html">delegate method</a> and capture the pathname it returns.</p>
 
 <p>The delegate method, <code>filesystemsource_pathname()</code>, should return a pathname if available, or <code>nil</code> if not. Examples follow:</p>
 
@@ -302,7 +302,7 @@ HttpSource.BasicLookupStrategy.url_suffix =
 
 <h5 id="HttpSourceScriptLookupStrategy">ScriptLookupStrategy</h5>
 
-<p>Sometimes, BasicLookupStrategy will not offer enough control. Perhaps you want to serve images from multiple URLs, or perhaps your identifiers are opaque and you need to run a database or web service request to locate them.  With this lookup strategy, you can tell HttpSource to invoke the <code>httpsource_resource_info()</code> <a href="delegate-script.html">delegate method</a> and capture the request info (URL and optionally authentication credentials and/or request headers) it returns.</p>
+<p>Sometimes, BasicLookupStrategy will not offer enough control. Perhaps you want to serve images from multiple URLs, or perhaps your identifiers are opaque and you need to run a database or web service request to locate them.  With this lookup strategy, you can tell HttpSource to invoke the <code>httpsource_resource_info()</code> <a href="delegate-system.html">delegate method</a> and capture the request info (URL and optionally authentication credentials and/or request headers) it returns.</p>
 
 <p>See the <a href="#FilesystemSourceScriptLookupStrategy">FilesystemSource ScriptLookupStrategy</a> section for examples of similar methods.</p>
 
@@ -384,7 +384,7 @@ S3Source.BasicLookupStrategy.path_suffix =
 
 <h5 id="S3SourceScriptLookupStrategy">ScriptLookupStrategy</h5>
 
-<p>When your URL identifiers don't match your S3 object keys, ScriptLookupStrategy is available to tell S3Source to capture the object key returned by a method in your <a href="delegate-script.html">delegate script</a>. The <code>s3source_object_info()</code> method should return a hash containing <code>bucket</code> and <code>key</code> keys, if an object is available, or <code>nil</code> if not. See the <a href="#FilesystemSourceScriptLookupStrategy">FilesystemSource ScriptLookupStrategy</a> section for examples of similar methods.</p>
+<p>When your URL identifiers don't match your S3 object keys, ScriptLookupStrategy is available to tell S3Source to capture the object key returned by a method in your <a href="delegate-system.html">delegate class</a>. The <code>s3source_object_info()</code> method should return a hash containing <code>bucket</code> and <code>key</code> keys, if an object is available, or <code>nil</code> if not. See the <a href="#FilesystemSourceScriptLookupStrategy">FilesystemSource ScriptLookupStrategy</a> section for examples of similar methods.</p>
 
 <h4>Format Inference</h4>
 
@@ -419,7 +419,7 @@ S3Source.BasicLookupStrategy.path_suffix =
 
 <h5 id="AzureStorageSourceScriptLookupStrategy">ScriptLookupStrategy</h5>
 
-<p>When your URL identifiers don't match your blob keys, ScriptLookupStrategy is available to tell AzureStorageSource to capture the blob key returned by a method in your <a href="delegate-script.html">delegate script</a>.</p>
+<p>When your URL identifiers don't match your blob keys, ScriptLookupStrategy is available to tell AzureStorageSource to capture the blob key returned by a method in your <a href="delegate-system.html">delegate class</a>.</p>
 
 <p>The delegate method, <code>azurestoragesource_blob_key()</code>, should return a blob key string if available, or <code>nil</code> if not. See the <a href="#FilesystemSourceScriptLookupStrategy">FilesystemSource ScriptLookupStrategy</a> section for examples of similar methods.</p>
 
@@ -442,7 +442,7 @@ S3Source.BasicLookupStrategy.path_suffix =
 
 <h3 id="JdbcSource">JdbcSource</h3>
 
-<p>JdbcSource maps a URL identifier to a BLOB field, for retrieving images from a relational database. It does not require a custom schema and can adapt to any schema, but some <a href="delegate-script.html">delegate methods</a> must be implemented in order to obtain the information needed to run the SQL queries.</p>
+<p>JdbcSource maps a URL identifier to a BLOB field, for retrieving images from a relational database. It does not require a custom schema and can adapt to any schema, but some <a href="delegate-system.html">delegate methods</a> must be implemented in order to obtain the information needed to run the SQL queries.</p>
 
 <p>The application does not include any JDBC drivers, so a driver JAR for the desired database must be obtained separately and saved somewhere on the classpath.</p>
 

@@ -92,7 +92,7 @@ title: Endpoints
 
 <h5 id="Additional Information Response Keys">Additional Information Response Keys</h5>
 
-<p>Custom keys can be added to the information JSON response, such as to declare <a href="https://iiif.io/api/annex/services/">service profiles</a> or add a <a href="https://iiif.io/api/image/3.0/#56-rights">rights statement</a>. The <a href="delegate-script.html">delegate script</a> needs to implement the <code>extra_iiif3_information_response_keys()</code> method. An example implementation follows:</p>
+<p>Custom keys can be added to the information JSON response, such as to declare <a href="https://iiif.io/api/annex/services/">service profiles</a> or add a <a href="https://iiif.io/api/image/3.0/#56-rights">rights statement</a>. The <a href="delegate-system.html">delegate class</a> needs to implement the <code>extra_iiif3_information_response_keys()</code> method. An example implementation follows:</p>
 
 {% highlight ruby %}
 class CustomDelegate
@@ -159,7 +159,7 @@ end
 
 <h5 id="Additional Information Response Keys">Additional Information Response Keys</h5>
 
-<p>Custom keys can be added to the information JSON response, such as to declare <a href="https://iiif.io/api/annex/services/">service profiles</a> or, beginning in Image API 2.1, an optional rights statement and/or logo. The <a href="delegate-script.html">delegate script</a> needs to implement the <code>extra_iiif2_information_response_keys()</code> method. An example implementation follows:</p>
+<p>Custom keys can be added to the information JSON response, such as to declare <a href="https://iiif.io/api/annex/services/">service profiles</a> or, beginning in Image API 2.1, an optional rights statement and/or logo. The <a href="delegate-system.html">delegate class</a> needs to implement the <code>extra_iiif2_information_response_keys()</code> method. An example implementation follows:</p>
 
 {% highlight ruby %}
 class CustomDelegate

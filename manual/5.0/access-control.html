@@ -32,7 +32,7 @@ title: Access Control
 
 <h2 id="Delegate Methods">Delegate Methods</h2>
 
-<p>The <a href="delegate-script.html">delegate script</a> can be used to implement authorization logic ranging from simple to complex. The <span class="filename">delegates.rb.sample</span> file contains two delegate methods&mdash;<code>pre_authorize()</code> and <code>authorize()</code>&mdash;along with documentation of how they work. By default, they both return <code>true</code>, authorizing all requests.</p>
+<p>The <a href="delegate-system.html">delegate system</a> can be used to implement authorization logic ranging from simple to complex. The <span class="filename">delegates.rb.sample</span> file contains two delegate methods&mdash;<code>pre_authorize()</code> and <code>authorize()</code>&mdash;along with documentation of how they work. By default, they both return <code>true</code>, authorizing all requests.</p>
 
 <p><code>pre_authorize()</code> is a new method in version 5.0. It is called upon all requests to all public endpoints early in the request cycle, before any image has been accessed. This means that it cannot be used to implement authorization policy that depends on information about the source image. However, because it is invoked early, it <strong>should</strong> be used to implement all other authorization logic.</p>
 
