@@ -29,7 +29,7 @@ title: Delegate System
       <li><a href="#Testing%20Delegate%20Methods">Testing Delegate Methods</a></li>
     </ul>
   </li>
-  <li><a href="Java%20Delegate">Java Delegate</a></li>
+  <li><a href="#Java%20Delegate">Java Delegate</a></li>
 </ul>
 
 <h2 id="Overview">Overview</h2>
@@ -260,6 +260,13 @@ puts obj.filesystemsource_pathname
 
 <h2 id="Java Delegate">Java Delegate</h2>
 
-<p>The Java delegate system was introduced in version 5.0. It relies on a delegate class that is very similar to the one used in the <a href="#Delegate%20Script">delegate script system</a>, but instead written in Java (or some other JVM language), compiled, and packed into a JAR file. Cantaloupe relies on the JDK's <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/ServiceLoader.html">ServiceLoader</a> to auto-discover the delegate class and then instantiate and use it in the same way the Ruby version is used.</p>
+<p>The Java delegate system was introduced in version 5.0. It relies on a delegate class that is very similar to the one used in the <a href="#Delegate%20Script">delegate script system</a>, but instead written in Java (or some other JVM language), compiled, and packed into a JAR file. Cantaloupe relies on the JDK's <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/ServiceLoader.html">ServiceLoader</a> system to auto-discover the delegate class and then instantiate and use it in the same way its Ruby counterpart is used.</p>
 
 <p>Unlike the delegate script, a sample Java delegate is not bundled with the application. Instead, refer to the <a href="https://github.com/cantaloupe-project/sample-java-delegate">sample Java delegate</a>, which provides a minimal working example.</p>
+
+<h3>Links</h3>
+
+<ul>
+  <li><a href="https://github.com/cantaloupe-project/sample-java-delegate">Sample Java delegate</a></li>
+  <li><a href="./javadoc/">Javadocs</a></li>
+</ul>
