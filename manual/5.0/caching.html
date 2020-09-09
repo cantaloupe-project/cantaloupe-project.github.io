@@ -23,7 +23,6 @@ title: Caching
           <li><a href="#S3Cache">S3Cache</a></li>
           <li><a href="#AzureStorageCache">AzureStorageCache</a></li>
           <li><a href="#RedisCache">RedisCache</a></li>
-          <li><a href="#DynamoDBCache">DynamoDBCache</a></li>
         </ul>
       </li>
     </ul>
@@ -343,17 +342,3 @@ CREATE INDEX identifier_idx ON {JdbcCache.info_table} (identifier);
 </ul>
 
 <p>Unlike with the other caches, cache policy is configured on the Redis side, and <code>cache.server.derivative.ttl_seconds</code> has no effect with this cache. Likewise, if enabled, the <a href="#Maintenance">cache worker</a> will remain idle.</p>
-
-<hr>
-
-<h4 id="DynamoDBCache">DynamoDBCache</h4>
-
-<p><a href="https://aws.amazon.com/dynamodb/">DynamoDB</a> is a high-performance NoSQL database in Amazon Web Services (AWS). This cache caches derivative images and infos in a DynamoDB table.</p>
-
-<p>This cache does not create the table itself. You must create the table with a string-type primary key named <code>PrimaryKey</code>.</p>
-
-<p>You should also consider setting up "time-to-live" (TTL) on the table, which will enable DynamoDB to periodically sweep through and purge invalid items, potentially reducing storage costs. Use <code>Expires</code> as the TTL column. When TTL is enabled, the <a href="#Maintenance">cache worker</a> is not needed.</p>
-
-<p>After creating the table, you may notice poor performance with the default provisioned throughout value. Increase this value to reduce the I/O bottleneck, or consider switching to the on-demand capacity mode.</p>
-
-<p>Due to limitations of DynamoDB, this cache supports a maximum cached item size of a little under 4 MiB. In most cases, this should be enough for the vast majority of images.</p>
