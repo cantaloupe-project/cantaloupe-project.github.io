@@ -26,3 +26,22 @@ figcaption {
   font-size: 0.9em;
   font-style: italic;
   text-align: center; }
+
+footer {
+  background-color: #022544;
+  border-top: 3px solid #515960;
+  height: 120px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: center;
+  color: white;
+  font-size: 0.8em;
+  img:first-child {
+    height: 28px;
+    margin-right: 8px;
+  }
+  img:nth-child(2) {
+    height: 28px;
+  }
+}
