@@ -600,11 +600,13 @@ title: Processors
 
 <h4>Optional Arguments</h4>
 
-<p>This processor supports a <code>time</code> URL query argument (which is nonstandard and Cantaloupe-specific) which can be used to return a frame at a particular second in the source video. The value of this argument should be in <code>HH:MM:SS</code> format, like:</p>
+<p>This processor supports a <a href="images.html#MetaIdentifiers">meta-identifier-encoded</a> second offset for requesting a frame at a particular second. (This is considered a page number.) For example, to request the frame closest to the 30-second offset using the <code>StandardMetaIdentifierTransformer</code> with default configuration:</p>
 
-<pre>http://example.org/iiif/2/video.mp4/full/full/0/default.jpg?time=00:02:15</pre>
+<pre>http://example.org/iiif/2/video.mp4;30/full/full/0/default.jpg</pre>
 
-<p>If it's missing, the first frame will be returned.</p>
+<p>When a second offset is not present, the first frame is returned.</p>
+
+<p class="text-warning"><i class="fa fa-exclamation-triangle"></i> Previous verions supported a <code>time</code> query argument. This still works in version 5.0, but is deprecated.</p>
 
 <hr>
 
@@ -626,8 +628,10 @@ title: Processors
 
 <h4>Optional Arguments</h4>
 
-<p>PdfBoxProcessor supports a <code>page</code> URL query argument (which is nonstandard and Cantaloupe-specific) which can be used to return a particular page of a PDF. For example:</p>
+<p>This processor supports a <a href="images.html#MetaIdentifiers">meta-identifier-encoded</a> page number for requesting a particular page of a PDF. For example, to request page 2 using the <code>StandardMetaIdentifierTransformer</code> with default configuration:</p>
 
-<pre>http://example.org/iiif/2/document.pdf/full/full/0/default.jpg?page=2</pre>
+<pre>http://example.org/iiif/2/document.pdf;2/full/full/0/default.jpg</pre>
 
-<p>If the <code>page</code> argument is missing, the first page will be returned.</p>
+<p>When a page number is not present, the first page is returned.</p>
+
+<p class="text-warning"><i class="fa fa-exclamation-triangle"></i> Previous verions supported a <code>page</code> query argument. This still works in version 5.0, but is deprecated.</p>

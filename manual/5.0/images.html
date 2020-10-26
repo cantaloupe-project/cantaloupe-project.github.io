@@ -7,7 +7,12 @@ title: Images
 
 <ul class="toc">
   <li><a href="#Source%20Formats">Source Formats</a></li>
-  <li><a href="#Identifiers">Identifiers</a></li>
+  <li><a href="#Identifiers">Identifiers</a>
+    <ul>
+      <li><a href="#MetaIdentifiers">Meta-Identifiers</a></li>
+      <li><a href="#URI%20Considerations">URI Considerations</a></li>
+    </ul>
+  </li>
   <li><a href="#Color%20Depth">Color Depth</a></li>
   <li><a href="#Color%20Profiles">Color Profiles</a></li>
   <li><a href="#Metadata">Metadata</a></li>
@@ -127,11 +132,33 @@ title: Images
 
 <h2 id="Identifiers">Identifiers</h2>
 
-<p>Every source image is considered to have a unique identifier, which appears in <a href="endpoints.html">endpoint</a> URIs and is used throughout the application to refer to the image.</p>
+<p>Every source image is considered to have a unique identifier, which appears in <a href="endpoints.html">endpoint</a> URIs and is used to reference the image throughout the application.</p>
 
 <p>Identifiers may be the same as, or may map to, filenames, pathnames, object keys, or some other identifying token in the underlying storage. The <a href="getting-started.html">Getting Started</a> section describes a simple setup in which URI identifiers map to pathname fragments on a filesystem, but this can make for identifiers that are ugly, unstable, and/or insecure. See <a href="sources.html">Sources</a> for information on setting up your underlying storage to meet your particular use case.</p>
 
-<h3>URI Considerations</h3>
+<h3 id="MetaIdentifiers">Meta-Identifiers</h3>
+
+<p>An identifier references a unique source image file, but for some images, more specificity may be needed. For example, an "image" like a PDF document may contain multiple pages, each of which is considered a separate image. A page number can be appended to the PDF's identifier to create a meta-identifier that can be supplied to an <a href="endpoints.html">IIIF Image API endpoint</a> in order to convey this extra information to the endpoint that its API does not natively support.</p>
+  
+<p>Meta-identifiers rely on a transformer object that performs serialization and deserialization. There are two such transformers available, selectable using the <code>meta_identifier.transformer</code> configuration key:</p>
+
+<h4>StandardMetaIdentifierTransformer</h4>
+
+<p>This is the out-of-the-box default transformer and is very simple, using one of the following formats:
+<ul>
+  <li><code>identifier</code></li>
+  <li><code>identifier;page_number</code></li>
+  <li><code>identifier;scale_constraint</code></li>
+  <li><code>identifier;page_number;scale_constraint</code></li>
+</ul>
+
+<p>The default component delimiter is a semicolon, but this can be changed using the <code>meta_identifier.transformer.StandardMetaIdentifierTransformer.delimiter</code> configuration key.</p>
+
+<h4>DelegateMetaIdentifierTransformer</h4>
+
+<p>This transformer invokes a pair of delegate methods to enable full control over serialization and deserialization (and, therefore, the precise format of the meta-identifiers). See the documentation of the <code>deserialize_meta_identifier()</code> and <code>deserialize_meta_identifier()</code> methods in the sample delegate script for more information.</p>
+
+<h3 id="URIConsiderations">URI Considerations</h3>
 
 <p>URI-illegal characters in identifiers must be encoded. For example, an image with an identifier of <span class="filename">a6/b3/c4.jp2</span> would need to appear in a URI as <span class="filename">a6%2Fb3%2Fc4.jp2</span>. When the application is behind a reverse proxy that cannot pass through encoded slashes (<span class="filename">%2F</span>) without decoding them, the <code>slash_substitute</code> configuration key can be used to specify a different character or character sequence to treat as a slash.</p>
 
