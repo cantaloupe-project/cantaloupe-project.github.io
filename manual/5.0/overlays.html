@@ -36,7 +36,7 @@ title: Overlays
 
 <p>The overlay feature overlays an image or text string on top of a derivative (output) image. This can be useful for description, branding, attribution, copyright notices, and so on.</p>
 
-<p>With both types of overlays, the position, inset, and output dimensions threshold (below which the overlay won't be displayed) are configurable.</p>
+<p>With both types of overlays, the position, inset, and output dimensions threshold (below which the overlay won't be drawn) are configurable.</p>
 
 <hr>
 
@@ -75,6 +75,10 @@ title: Overlays
     <i class="fa fa-download"></i>
     Sample overlay image (PNG)
   </a>
+</p>
+
+<p class="text-info">
+  <i class="fa fa-info-circle"></i> The sample image above is opaque. To achieve the semi-transparency that some of the examples below demonstrate, the alpha channel must be rescaled in an image editor.
 </p>
 
 <h3 id="Image BasicStrategy Examples">BasicStrategy Examples</h3>
@@ -137,7 +141,7 @@ end
 <p>ScriptStrategy can work the same way, but it also supports a word wrap mode, which can be enabled by returning a value of <code>true</code> for a <code>word_wrap</code> key in the hash returned from <code>overlay()</code>. When word wrap is enabled, the string is broken at word boundaries to fit inside the width of the image. If the resulting string's height exceeds the image's height, it won't be drawn.</p>
 
 <p class="text-info">
-  <i class="fa fa-info-circle"> To get a list of all available fonts, start the JVM with the <code>-list-fonts</code> command-line argument.</i></p>
+  <i class="fa fa-info-circle"></i> To get a list of all available fonts, start the JVM with the <code>-list-fonts</code> command-line argument.</p>
 
 <h3 id="String BasicStrategy Examples">BasicStrategy Examples</h3>
 

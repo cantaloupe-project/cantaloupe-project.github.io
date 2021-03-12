@@ -33,7 +33,7 @@ title: Metadata
   <dt><a href="https://iptc.org/standards/iim/">IPTC IIM</a></dt>
   <dd>Serialization and vocabulary developed by the IPTC. Simple binary encoding with a fixed vocabulary. The serialization is not used much anymore, but the vocabulary has been migrated to the "IPTC Core" schema used in XMP.</dd>
   <dt><a href="https://www.adobe.com/products/xmp.html">XMP</a></dt>
-  <dd>RDF-based encoding developed by Adobe. Widely supported across many formats and even non-image media files. May contain terms from the EXIF and IPTC standards as well as from other vocabularies. The current de facto embedded metadata standard.</dd>
+  <dd>RDF-based encoding developed by Adobe. Widely supported across many formats and even non-image media files. May contain terms from the EXIF and IPTC standards as well as from other vocabularies. The current de facto embedded metadata standard, generally.</dd>
   <dt>Native standards</dt>
   <dd>Some image formats define their own metadata standards. PNG and TIFF define small term vocabularies, for example.</dd>
 </dl>
@@ -93,7 +93,7 @@ title: Metadata
 
 <h2 id="Copying & Mutating">Copying &amp; Mutating</h2>
 
-<p>While Cantaloupe is capable of reading several different source metadata formats, it can write only XMP. This simplifies the metadata API and reduces crosswalking challenges, as XMP is flexible enough to express EXIF and IIM with no information loss. XMP can also be embedded into many image formats and is widely supported by imaging software.</p>
+<p>While several different source metadata formats can be read, only XMP can be written. This simplifies the metadata API and reduces crosswalking challenges, as XMP is flexible enough to express EXIF and IIM with no information loss. XMP can also be embedded into many image formats and is widely supported by imaging software.</p>
 
 <p>XMP is serialized as RDF/XML. A very simple XMP packet might look like:</p>
 
@@ -123,7 +123,7 @@ title: Metadata
 </rdf:RDF>
 {% endhighlight %}
 
-<p>The following sections use this packet for a crash course on practical metadata manipulation. Note that the <a href="https://www.adobe.com/devnet/xmp.html">XMP standard</a> is quite complex and is based on <a href="https://www.w3.org/RDF/">RDF</a>, which itself is complex, so what follows is not implied to be a replacement for the several hundred pages of reading needed to fully grasp those respective standards.</p>
+<p>Note that the <a href="https://www.adobe.com/devnet/xmp.html">XMP standard</a> is quite complex and is based on <a href="https://www.w3.org/RDF/">RDF</a>, which itself is complex, so what follows is not implied to be a replacement for the several hundred pages of reading needed to fully grasp those respective standards.</p>
 
 <h3 id="Verbatim Copying">Verbatim Copying</h3>
 
@@ -139,16 +139,39 @@ end
 
 <p>Continuing with the example above, we assume that the source image's IPTC metadata contains a copyright statement that we'd like to copy into derivative images' XMP data.</p>
 
-<p>According to the <a href="https://www.iptc.org/std/IIM/4.1/specification/IIMV4.1.pdf">IPTC IIM standard</a>, the tag most likely to contain a copyright statement is <code>CopyrightNotice</code> (p. 39).</p>
+<p>According to the <a href="https://www.iptc.org/std/IIM/4.1/specification/IIMV4.1.pdf">IPTC IIM specification</a>, the tag most likely to contain a copyright statement is <code>CopyrightNotice</code> (p. 39). We will choose to translate this into a Dublin Core <code>rights</code> element in XMP.</p>
 
 {% highlight ruby %}
+java_import java.io.StringWriter
+
 def metadata(options = {})
   metadata = context['metadata']
-  iptc = metadata['iptc']
+  iptc     = metadata['iptc']
   if iptc
-    copyright = iptc.find{ |d| d['tagName'] == 'CopyrightNotice' }
-    if copyright
-      # TODO: write this
+    # In IPTC IIM terminology, the basic data structure is the "data set."
+    # IIM data may contain multiple data sets, each identified by a "tag" and
+    # having a "data field" containing the value. This structure is translated
+    # into the delegate context as an array of one-element hashes representing
+    # the data sets, each with a tag name key and data field value.
+    data_set = iptc.find{ |ds| ds.keys.first == 'CopyrightNotice' }
+    if data_set
+      copyright = data_set['CopyrightNotice']
+
+      # Add a custom dc:rights property.
+      res  = model.createResource
+      obj  = model.createLiteral(copyright, false)
+      prop = model.createProperty('http://purl.org/dc/elements/1.1/rights')
+      stmt = model.createStatement(res, prop, obj)
+      model.add(stmt)
+  
+      # Write the model to XML and return it.
+      writer = StringWriter.new
+      begin
+        model.write(writer);
+        return writer.toString
+      ensure
+        writer.close
+      end
     end
   end
 end
@@ -156,36 +179,35 @@ end
 
 <h3 id="Modifying Properties">Modifying Properties</h3>
 
-<p>In this example, we want to remove any <code>dc:title</code> property that may be present in the source XMP, and add our own. We use <a href="https://jena.apache.org/documentation/javadoc/jena/org/apache/jena/rdf/model/Model.html">Jena</a> to do this.</p>
+<p>In this example, we want to remove any <code>dc:title</code> property that may be present in the source XMP, and add our own. We use <a href="https://jena.apache.org/documentation/javadoc/jena/org/apache/jena/rdf/model/Model.html">Jena</a>, which is bundled into the application, to do this.</p>
 
 {% highlight ruby %}
 java_import java.io.StringWriter
 
 def metadata(options = {})
   metadata = context['metadata']
-  model = metadata['xmp_model']
+  model    = metadata['xmp_model']
   if model
     # Search for dc:title properties.
     prop = model.createProperty('http://purl.org/dc/elements/1.1/title')
-    it = model.listStatements(nil, prop, nil)
+    it   = model.listStatements(nil, prop, nil)
 
     # Remove them.
     it.removeNext while it.hasNext
 
     # Add a custom dc:title property.
-    res = model.createResource
-    obj = model.createLiteral('Hello world', false)
+    res  = model.createResource
+    obj  = model.createLiteral('Hello world', false)
     stmt = model.createStatement(res, prop, obj)
     model.add(stmt)
 
     # Write the model to XML and return it.
-    writer = nil
+    writer = StringWriter.new
     begin
-      writer = StringWriter.new
-      model.write(writer);
+      model.write(writer)
       return writer.toString
     ensure
-      writer&.close
+      writer.close
     end
   end
   nil

@@ -37,8 +37,8 @@ title: Delegate System
 <p>The delegate system enables the use of custom code to customize the image server's behavior. It can be utilized in one of two ways:</p>
 
 <ol>
-  <li><a href="#Delegate%20Script">Using the Ruby delegate script.</a> This method is designed for ease of use. The language in which the script code is written&mdash;Ruby&mdash;is easy to work with, and only a small amount of code is needed to support most use cases.</a></li>
-  <li><a href="#Java%20Delegate">Using a Java delegate.</a> This is an alternative to the delegate script for users who require the fastest possible startup time, or are more comfortable with Java than Ruby.</li>
+  <li><a href="#Delegate%20Script">Using the Ruby delegate script.</a> This method is designed for ease of use. Ruby is generally easy to work with, and only a small amount of code is needed to support most use cases.</a></li>
+  <li><a href="#Java%20Delegate">Using a Java delegate.</a> This is an alternative to the delegate script for users who require faster startup time or are more comfortable with Java than Ruby.</li>
 </ol>
 
 <hr>
@@ -63,15 +63,10 @@ title: Delegate System
 <p>The delegate script is disabled by default. To enable it, follow these steps:</p>
 
 <ol>
-  <li><a href="https://www.jruby.org/download">Download one of the "complete JARs" from the JRuby download page</a>, and save it wherever you like. (Your Cantaloupe root directory will work fine.)</li>
   <li>Copy the sample delegate script, <span class="filename">delegates.rb.sample</span>, included in the distribution, to <span class="filename">delegates.rb</span>.</li>
   <li>Reference it from the <code>delegate_script.pathname</code> configuration option.</li>
   <li>Set <code>delegate_script.enabled</code> to <code>true</code>.</li>
-  <li>Add the JRuby JAR from above to the classpath in your invocation command. For example:
-    <pre>java -cp cantaloupe-<span class="version">5.0</span>.jar:jruby-complete-x.x.x.x.jar -Dcantaloupe.config=... edu.illinois.library.cantaloupe.StandaloneEntry</pre>
-  </li>
 </ol>
-
 
 <h3 id="Migrating">Migrating</h3>
 
@@ -197,7 +192,7 @@ end
 
 <h4 id="Connection Pooling">Connection Pooling</h4>
 
-<p>Most HTTP clients maintain an internal connection pool automatically, but JDBC adapters do not. When accessing a database via JDBC, consider using a connection pool to improve performance. As of now, there is no &quot;official&quot; provision for this, but some options include:</p>
+<p>Most HTTP clients maintain an internal connection pool, but JDBC adapters do not. When accessing a database via JDBC, consider using a connection pool to improve performance. As of now, there is no &quot;official&quot; provision for this, but some options include:</p>
 
 <ol>
   <li>Use the built-in HikariCP pool used by JdbcSource and JdbcCache, noting that HikariCP is not part of the delegate script contract and may change or go away at some point (see <a href="https://github.com/cantaloupe-project/cantaloupe/issues/221#issuecomment-398402952">here</a> for an example that may or may not work);</li>
@@ -230,7 +225,7 @@ logger = Java::edu.illinois.library.cantaloupe.delegate.Logger
 begin
   raise 'Goodbye world'
 rescue => e
-  logger.error "#{e}", e
+  logger.error("#{e}", e)
 end
 {% endhighlight %}
 
@@ -254,13 +249,13 @@ puts obj.filesystemsource_pathname
 
 <p>This script can then be run on the command line with a command like: <code>ruby test.rb</code>.</p>
 
-<p class="text-info"><i class="fa fa-info-circle"></i> The <span class="filename">ruby</span> command will normally invoke the standard ("MRI") Ruby interpreter, and not the JRuby interpreter. While they mostly work pretty similar, <strong>gems with platform-native extensions won't work in JRuby</strong>. Consider installing a standalone <a href="http://jruby.org">JRuby interpreter</a> and test with that instead. (Something like <a href="http://rvm.io/">RVM</a> can make it easier to switch between different versions of the Ruby interpreter.)</p>
+<p class="text-info"><i class="fa fa-info-circle"></i> The <span class="filename">ruby</span> command will normally invoke the standard ("MRI") Ruby interpreter, and not the JRuby interpreter. While they mostly work pretty similar, <strong>gems with platform-native extensions won't work in JRuby</strong>. Consider installing a standalone <a href="http://jruby.org">JRuby interpreter</a> and test with that instead. (A tool like <a href="http://rvm.io/">RVM</a> can make it easy to switch between different Ruby environments.)</p>
 
 <hr>
 
 <h2 id="Java Delegate">Java Delegate</h2>
 
-<p>The Java delegate system was introduced in version 5.0. It relies on a delegate class that is very similar to the one used in the <a href="#Delegate%20Script">delegate script system</a>, but instead written in Java (or some other JVM language), compiled, and packed into a JAR file. Cantaloupe relies on the JDK's <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/ServiceLoader.html">ServiceLoader</a> system to auto-discover the delegate class and then instantiate and use it in the same way its Ruby counterpart is used.</p>
+<p>The Java delegate system was introduced in version 5.0. It relies on a delegate class that is very similar to the one used in the <a href="#Delegate%20Script">delegate script system</a>, but instead is written in Java (or some other JVM language), compiled, and packed into a JAR file. Cantaloupe relies on the JDK's <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/ServiceLoader.html">ServiceLoader</a> system to auto-discover the delegate class and then instantiate and use it in the same way its Ruby counterpart is used.</p>
 
 <p>Unlike the delegate script, a sample Java delegate is not bundled with the application. Instead, refer to the <a href="https://github.com/cantaloupe-project/sample-java-delegate">sample Java delegate</a>, which provides a minimal working example.</p>
 
@@ -268,5 +263,5 @@ puts obj.filesystemsource_pathname
 
 <ul>
   <li><a href="https://github.com/cantaloupe-project/sample-java-delegate">Sample Java delegate</a></li>
-  <li><a href="./javadoc/">Javadocs</a></li>
+  <li><a href="./javadoc/">Java delegate Javadocs</a></li>
 </ul>

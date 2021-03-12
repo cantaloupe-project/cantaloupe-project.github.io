@@ -19,7 +19,7 @@ title: Getting Started
 
 <h2 id="Requirements">Requirements</h2>
 
-<p>The only absolute requirement is Java 11. Later versions may also work, but are untested. Optional components, like particular <a href="sources.html">sources</a>, <a href="processors.html">processors</a>, or <a href="caching.html">caches</a>, may have additional requirements.</p>
+<p>The base requirement is Java 11. Newer versions are also likely to work. Optional components, like particular <a href="sources.html">sources</a>, <a href="processors.html">processors</a>, or <a href="caching.html">caches</a>, may have requirements of their own.</p>
 
 <hr>
 
@@ -35,7 +35,7 @@ title: Getting Started
 
 <h3 id="Command Line">Command Line</h3>
 
-<p>From a command prompt, invoke one of the commands below. The first command is shorter while the second can be used to modify the classpath:</p>
+<p>From a command prompt, invoke the following command:</p>
 
 <ul class="nav nav-pills" role="tablist">
   <li class="nav-item">
@@ -48,26 +48,24 @@ title: Getting Started
 <div class="tab-content">
   <div class="tab-pane fade show active" id="run-linux1" role="tabpanel" aria-labelledby="run-linux-tab1">
     <pre>java -Dcantaloupe.config=/path/to/cantaloupe.properties -Xmx2g -jar cantaloupe-<span class="version">5.0</span>.x.jar</pre>
-    <pre>java -cp cantaloupe-<span class="version">5.0</span>.jar -Dcantaloupe.config=/path/to/cantaloupe.properties -Xmx2g edu.illinois.library.cantaloupe.StandaloneEntry</pre>
   </div>
   <div class="tab-pane fade" id="run-windows1" role="tabpanel" aria-labelledby="run-windows-tab1">
     <pre>java -Dcantaloupe.config=C:\path\to\cantaloupe.properties -Xmx2g -jar cantaloupe-<span class="version">5.0</span>.x.jar</pre>
-    <pre>java -cp cantaloupe-<span class="version">5.0</span>.jar -Dcantaloupe.config=C:\path\to\cantaloupe.properties -Xmx2g edu.illinois.library.cantaloupe.StandaloneEntry</pre>
   </div>
 </div>
 
 <p>Assuming you have an image named <span class="filename">image.tif</span>, try accessing:</p>
 
 <ul>
-  <li><a href="http://localhost:8182/iiif/2/image.tif/info.json">http://localhost:8182/iiif/2/image.tif/info.json</a></li>
-  <li><a href="http://localhost:8182/iiif/2/image.tif/0,0,200,200/full/0/default.jpg">http://localhost:8182/iiif/2/image.tif/0,0,200,200/full/0/default.jpg</a></li>
+  <li><a href="http://localhost:8182/iiif/3/image.tif/info.json">http://localhost:8182/iiif/3/image.tif/info.json</a></li>
+  <li><a href="http://localhost:8182/iiif/3/image.tif/0,0,200,200/max/0/default.jpg">http://localhost:8182/iiif/3/image.tif/0,0,200,200/max/0/default.jpg</a></li>
 </ul>
 
-<p>The <code>-Xmx2g</code> argument tells the JVM that it can use a maximum of 2 GB of heap space, which should be more than enough for evaluation purposes, but maybe not for production&mdash;see <a href="deployment.html#HardwareMemory">Memory Considerations</a>.</p>
+<p>The <code>-Xmx2g</code> argument tells the JVM that it can use a maximum of 2 GB of heap space, which should be plenty for evaluation, but maybe not for production&mdash;see <a href="deployment.html#HardwareMemory">Memory Considerations</a>.</p>
 
 <h3 id="Docker">Docker</h3>
 
-<p>There is currently no official Docker repository, but Docker is used to run the tests in continuous integration, and <a href="https://github.com/cantaloupe-project/cantaloupe/blob/develop/docker/test/Dockerfile">the Dockerfile for those</a> could be a helpful starting point.</p>
+<p>There is currently no official Docker image. Docker is used to run the tests in continuous integration, so <a href="https://github.com/cantaloupe-project/cantaloupe/blob/develop/docker">the Dockerfiles for those</a> could be a helpful starting point.</p>
 
 <hr>
 

@@ -25,13 +25,13 @@ title: Sources
   </li>
 </ul>
 
-<p>Sources provide access to source images, translating request URI <a href="images.html#Identifiers">identifiers</a> into a source image locators, such as pathnames, in a particular type of underlying storage. After verifying that an underlying object exists and is accessible, a source can then provide access to it to other application components in a generalized way.</p>
+<p>Sources provide access to source images, translating request URI <a href="images.html#Identifiers">identifiers</a> into a source image locators, such as pathnames, in a particular type of underlying storage. After verifying that an underlying object exists and is accessible, a source can provide access to it to other application components in a generalized way.</p>
 
 <h2 id="Features">Features</h2>
 
-<p>All sources can provide access to streams from which to read a resource, but only <a href="#FilesystemSource">FilesystemSource</a> can provide access to files. This distinction is important because <a href="processors.html#Supported%20Features">not all processors can read from streams</a>. See <a href="images.html#Considerations">Image Considerations</a> for background on why this is an issue.</p>
+<p>All sources can provide access to streams from which to read a resource, but only <a href="#FilesystemSource">FilesystemSource</a> can provide access to files. This distinction is important because <a href="processors.html#Supported%20Features">not all processors can read from streams</a>.</p>
 
-<p>Of the sources that provide stream accesss, not all support seeking. Seeking can be of enormous benefit when using certain processor/source format combinations that can fully exploit it, which are currently:</p>
+<p>Of the sources that provide stream accesss, not all support random access. Random access can be of enormous benefit when using certain processor/source format combinations that can fully exploit it, which are currently:</p>
 
 <ul>
   <li><a href="processors.html#KakaduNativeProcessor">KakaduNativeProcessor</a> with JPEG2000</li>
@@ -43,7 +43,7 @@ title: Sources
     <tr>
       <th>Source</th>
       <th>Type</th>
-      <th>Seeking</th>
+      <th>Random Access</th>
     </tr>
   </thead>
   <tbody>
@@ -81,15 +81,15 @@ title: Sources
 
 <h2 id="Selection">Selection</h2>
 
-<p>In a typical configuration, <a href="#Static%20Source">one source will handle all requests</a>. It's also possible to <a href="#Dynamic%20Sources">select a source dynamically</a> depending on the image identifier.</p>
+<p>In a simple configuration, <a href="#Static%20Source">one source supplies all requests</a>. But it's also possible to <a href="#Dynamic%20Sources">select a source dynamically</a> depending on the image identifier.</p>
 
 <h3 id="Static Source">Static Source</h3>
 
-<p>When the <code>source.static</code> configuration key is set to the name of a source, that source will handle all requests.</p>
+<p>When the <code>source.static</code> configuration key is set to the name of a source, that source will supply all requests.</p>
 
 <h3 id="Dynamic Sources">Dynamic Sources</h3>
 
-<p>When a static source is not flexible enough, it is also possible to serve images from different sources from the same application instance. For example, you may have some images stored on a filesystem, and others stored in an S3 bucket. <em>If you can differentiate their sources based on their identifier in code</em>&mdash;either by analyzing the identifier string, or performing some kind of service request&mdash;you can write a <a href="delegate-system.html">delegate method</a> to tell the image server which source to use for a given request.</p>
+<p>When a static source is not flexible enough, it is also possible to serve images from different sources. For example, you may have some images stored on a filesystem, and others stored in an S3 bucket. <em>If you can differentiate their sources based on their identifier in code</em>&mdash;either by analyzing the identifier string, or performing some kind of service request&mdash;you can implement a <a href="delegate-system.html">delegate method</a> to tell the image server from which source it should obtain the image.</p>
 
 <p>To enable dynamic source selection, set the <code>source.delegate</code> configuration key to <code>true</code>, and implement the <code>source()</code> delegate method. For example:</p>
 
@@ -99,7 +99,7 @@ class CustomDelegate
     identifier = context['identifier']
     # Here, you would perform some kind of analysis on `identifier`:
     # parse it, look it up in a web service or database...
-    # and then return the name of the source to use to serve it.
+    # and then return the name of the source to supply it.
     'FilesystemSource'
   end
 end
@@ -156,7 +156,7 @@ end
 
 <h3 id="FilesystemSource">FilesystemSource</h3>
 
-<p>FilesystemSource maps a URL identifier to a filesystem path, for retrieving images on a local or network-mounted filesystem. This is the most compatible source, and usually the most efficient as well.</p>
+<p>FilesystemSource maps a URL identifier to a filesystem path. This is the most compatible source, and usually the most efficient as well.</p>
 
 <h4>Lookup Strategies</h4>
 
@@ -184,7 +184,7 @@ FilesystemSource.BasicLookupStrategy.path_suffix =
 <p>To prevent arbitrary directory traversal, BasicLookupStrategy will recursively strip out <span class="filename">../</span>, <span class="filename">/..</span>, <span class="filename">..\</span>, and <span class="filename">\..</span> from identifiers before resolving the path.</p>
 
 <div class="alert alert-danger">
-  <i class="fa fa-warning"></i> Consider setting <code>FilesystemSource.BasicLookupStrategy.path_prefix</code> as deep as possible. The shallower the path, the more of the filesystem that will be exposed.
+  <i class="fa fa-warning"></i> Consider setting <code>FilesystemSource.BasicLookupStrategy.path_prefix</code> to the deepest possible path. The shallower the path, the more of the filesystem that will be exposed.
 </div>
 
 <h5 id="FilesystemSourceScriptLookupStrategy">ScriptLookupStrategy</h5>
@@ -209,7 +209,7 @@ class CustomDelegate
 
   # By making the connection static, we can avoid reconnecting every time
   # the method is called, which would be expensive.
-  # See: https://docs.oracle.com/javase/8/docs/api/java/sql/DriverManager.html
+  # See: https://docs.oracle.com/en/java/javase/11/docs/api/java.sql/java/sql/DriverManager.html
   @@conn = DriverManager.get_connection(JDBC_URL, JDBC_USER, JDBC_PASSWORD)
 
   def filesystemsource_pathname(options = {})
@@ -232,7 +232,7 @@ class CustomDelegate
 end
 {% endhighlight %}
 
-<p>Note that several common Ruby database libraries (like the mysql and pgsql gems) use native extensions. These won't work in JRuby. Instead, the course of action above is to use the JDBC API via the JRuby-Java bridge. For this to work, a JDBC driver for your database must be installed on the Java classpath, and referenced in a <code>java_import</code> statement.</p>
+<p>Note that several common Ruby database libraries (like the mysql and pgsql gems) use native extensions. These won't work in JRuby. Instead, the course of action above is to use the JDBC API via the JRuby-Java bridge. For this to work, a JDBC driver for your database must be available on the Java classpath, and referenced in a <code>java_import</code> statement.</p>
 
 <h5>Example 2: Query a web service to find the pathname corresponding to a given identifier</h5>
 
@@ -265,14 +265,14 @@ end
 <ol>
   <li>If the file's filename contains an extension, the format is inferred from that.</li>
   <li>If unsuccessful, and the identifier contains a filename extension, the format is inferred from that.</li>
-  <li>If unsuccessful, an attempt is made to infer a format from the file's magic bytes.</li>
+  <li>If unsuccessful, an attempt is made to infer a format from the file's &quot;magic bytes.&quot;</li>
 </ol>
 
 <hr>
 
 <h3 id="HttpSource">HttpSource</h3>
 
-<p>HttpSource maps a URL identifier to an HTTP or HTTPS resource, for retrieving images from a remote web server. It uses an <a href="https://square.github.io/okhttp/">OkHttp client</a> internally.</p>
+<p>HttpSource maps a URL identifier to an HTTP or HTTPS resource, for retrieving images from a web server. It uses an <a href="https://square.github.io/okhttp/">OkHttp client</a> internally.</p>
 
 <h4>Lookup Strategies</h4>
 
@@ -327,9 +327,9 @@ HttpSource.BasicLookupStrategy.url_suffix =
   <li>If still unsuccessful, the request fails.</li>
 </ol>
 
-<h4 id="HttpSourceSeeking">Seeking</h4>
+<h4 id="HttpSourceRandomAccess">Random Access</h4>
 
-<p>Since version 4.1, this source is able to facilitate seeking by requesting small chunks of image data as needed, as opposed to all of it. This may improve efficiency&mdash;possibly massively&mdash;when reading small portions of large images in certain formats (see below). Conversely, it may reduce efficiency when reading large portions of images, but this use case is probably less common.</p>
+<p>Since version 4.1, this source supports random access by requesting small chunks of image data as needed, as opposed to all of it. This may improve efficiency&mdash;possibly massively&mdash;when reading small portions of large images in certain formats (see below). Conversely, it may reduce efficiency when reading large portions of images.</p>
 
 <p>In order for this technique to work:</p>
 
@@ -346,20 +346,29 @@ HttpSource.BasicLookupStrategy.url_suffix =
 
 <p>Note that when chunking is in effect, the <code>processor.stream_retrieval_strategy</code> configuration key is ignored, effectively behaving as if it were set to <code>StreamStrategy</code>. (See <a href="processors.html#Retrieval%20Strategies">Retrieval Strategies</a>.) Chunking is meant to obviate the expense of the other strategies.</p>
 
-<div class="alert alert-info">
+<p class="text-info">
   <i class="fa fa-info-circle"></i>
   The HTTP client library used by this source changed in version 5.0. The old client (Jetty) used <code>$JAVA_HOME/jre/lib/security/cacerts</code> as its trust store, whereas the new client (OkHttp) uses the value of the <code>javax.net.ssl.trustStore</code> VM argument. After migrating from 4.1, if you encounter errors like, "PKIX path building failed," try setting the value of that VM argument to the aforementioned path, or the path of some other trust store.
-</div>
+</p>
 
 <hr>
 
 <h3 id="S3Source">S3Source</h3>
 
-<p>S3Source maps a URL identifier to an <a href="https://aws.amazon.com/s3/">Amazon Simple Storage Service (S3)</a> object, for retrieving images from S3. S3Source can work with both AWS and non-AWS S3 endpoints.</p>
+<p>S3Source maps a URL identifier to a <a href="https://aws.amazon.com/s3/">Simple Storage Service (S3)</a> object. S3Source can work with both AWS and non-AWS S3 endpoints.</p>
 
 <h4 id="S3SourceCredentialsSources">Credentials Sources</h4>
 
-<p>S3Source can obtain its credentials from several different sources. It will first consult the <code>S3Source.access_key_id</code> and  <code>S3Source.secret_key</code> keys in the application configuration. If those are not set, it will fall back to the strategy employed by the AWS SDK's <code>DefaultAWSCredentialsProviderChain</code>; see its <a href="https://docs.aws.amazon.com/AWSJavaSDK/latest/javadoc/index.html?com/amazonaws/auth/DefaultAWSCredentialsProviderChain.html">class documentation</a> for details.</p>
+<p>Credentials are obtained from the following sources in order of priority:</p>
+
+<ol>
+  <li>The <code>aws.accessKeyId</code> and <code>aws.secretKey</code> system properties</li>
+  <li>The <code>AWS_ACCESS_KEY_ID</code> and <code>AWS_SECRET_ACCESS_KEY</code> environment variables</li>
+  <li>The <code>S3Source.access_key_id</code> and  <code>S3Source.secret_key</code> keys in the application configuration</li>
+  <li>The <span class="filename">~/.aws/credentials</span> file</li>
+  <li>The Amazon EC2 container service (if the <code>AWS_CONTAINER_CREDENTIALS_RELATIVE_URI</code> environment variable is set and the security manager has permission to access it)</li>
+  <li>Instance profile credentials delivered through the Amazon EC2 metadata service</li>
+</ol>
 
 <h4 id="S3SourceLookupStrategies">Lookup Strategies</h4>
 
@@ -401,15 +410,15 @@ S3Source.BasicLookupStrategy.path_suffix =
   </li>
 </ol>
 
-<h4>Seeking</h4>
+<h4>Random Access</h4>
 
-<p>This source supports seeking since version 4.1. See the <a href="#HttpSourceSeeking">HttpSource</a> section for an explanation of this feature.</p>
+<p>This source supports random access since version 4.1. See the <a href="#HttpSourceRandomAccess">HttpSource</a> section for an explanation of this feature.</p>
 
 <hr>
 
 <h3 id="AzureStorageSource">AzureStorageSource</h3>
 
-<p>AzureStorageSource maps a URL identifier to a <a href="https://azure.microsoft.com/en-us/services/storage/">Microsoft Azure Blob Storage</a> blob, for retrieving images from Azure Blob Storage.</p>
+<p>AzureStorageSource maps a URL identifier to a <a href="https://azure.microsoft.com/en-us/services/storage/">Microsoft Azure Blob Storage</a> blob.</p>
 
 <h4>Lookup Strategies</h4>
 
@@ -434,15 +443,15 @@ S3Source.BasicLookupStrategy.path_suffix =
   <li>Otherwise, a <code>GET</code> request is sent with a <code>Range</code> header specifying a small range of data from the beginning of the resource, and a format is inferred from the magic bytes in the response body.</li>
 </ol>
 
-<h4>Seeking</h4>
+<h4>Random Access</h4>
 
-<p>This source supports seeking since version 4.1. See the <a href="#HttpSourceSeeking">HttpSource</a> section for an explanation of this feature.</p>
+<p>This source supports random access since version 4.1. See the <a href="#HttpSourceRandomAccess">HttpSource</a> section for an explanation of this feature.</p>
 
 <hr>
 
 <h3 id="JdbcSource">JdbcSource</h3>
 
-<p>JdbcSource maps a URL identifier to a BLOB field, for retrieving images from a relational database. It does not require a custom schema and can adapt to any schema, but some <a href="delegate-system.html">delegate methods</a> must be implemented in order to obtain the information needed to run the SQL queries.</p>
+<p>JdbcSource maps a URL identifier to a BLOB field in a relational database. It does not require a custom schema and can adapt to any schema, but some <a href="delegate-system.html">delegate methods</a> must be implemented in order to obtain the information needed to run the SQL queries.</p>
 
 <p>The application does not include any JDBC drivers, so a driver JAR for the desired database must be obtained separately and saved somewhere on the classpath.</p>
 

@@ -17,7 +17,6 @@ title: Endpoints
           <li><a href="#Page%20Selection">Page Selection</a></li>
           <li><a href="#Response%20Content%20Disposition">Response Content Disposition</a></li>
           <li><a href="#Overriding%20Cache%20Behavior">Overriding Cache Behavior</a></li>
-          <li><a href="#Processor-Specific%20Arguments">Processor-Specific Arguments</a></li>
         </ul>
       </li>
     </ul>
@@ -79,7 +78,7 @@ title: Endpoints
 
 <dl>
   <dt><code>sizes</code></dt>
-  <dd>An array of width/height pairs according to the formula <i>dimension * 1/2<sup>n</sup> &gt; <code>endpoint.iiif.min_size</code></i>. (To restrict access to only these sizes, use the <code>endpoint.iiif.restrict_to_sizes</code> configuration option.)</dd>
+  <dd>An array of width/height pairs according to the formula <i>dimension &times; 1/2<sup>n</sup> &gt; <code>endpoint.iiif.min_size</code></i>. (To restrict access to only these sizes, use the <code>endpoint.iiif.restrict_to_sizes</code> configuration option.)</dd>
   <dt><code>tiles</code></dt>
   <dd>Contains a tile size that will be relatively efficient to deliver, along with a list of scale factors at which each size is available.
     <ul>
@@ -138,7 +137,7 @@ end
 
 <dl>
   <dt><code>sizes</code></dt>
-  <dd>An array of width/height pairs according to the formula <i>dimension * 1/2<sup>n</sup> &gt; <code>endpoint.iiif.min_size</code></i>. (To restrict access to only these sizes, use the <code>endpoint.iiif.restrict_to_sizes</code> configuration option.)</dd>
+  <dd>An array of width/height pairs according to the formula <i>dimension &times; 1/2<sup>n</sup> &gt; <code>endpoint.iiif.min_size</code></i>. (To restrict access to only these sizes, use the <code>endpoint.iiif.restrict_to_sizes</code> configuration option.)</dd>
   <dt><code>tiles</code></dt>
   <dd>Contains a tile size that will be relatively efficient to deliver, along with a list of scale factors at which each size is available.
     <ul>
@@ -208,7 +207,7 @@ end
   <dd>These keys refer to tile dimensions that will be relatively efficient to deliver.
     <ul>
       <li>For images that are natively tiled, these will be the smallest of the native tile dimensions, the value of the <code>endpoint.iiif.min_tile_size</code> configuration key, or the full image dimensions.</li>
-      <li>For untiled images, these will be the smallest value of <i>n</i> for the formula: <i>(smallest dimension) * 1/2<sup>n</sup> &gt; <code>endpoint.iiif.min_tile_size</code></i>.</li>
+      <li>For untiled images, these will be the smallest value of <i>n</i> for the formula: <i>(smallest dimension) &times; 1/2<sup>n</sup> &gt; <code>endpoint.iiif.min_tile_size</code></i>.</li>
     </ul>
   </dd>
   <dt><code>formats</code></dt>
@@ -231,10 +230,10 @@ end
 
 <p>The <a href="https://tools.ietf.org/html/rfc6266"><code>Content-Disposition</code></a> HTTP response header tells clients whether to attempt to display a response entity inline or download it, perhaps accompanied by a user prompt. A <code>response-content-disposition</code> query argument can be used to suggest a value to override that on a per-request basis. This is useful for &quot;linking to a download.&quot; For example, the following URL will cause web browsers to download the image identified by <code>some-identifier</code> and save it as <span class="filename">image.jpg</span>:</p>
 
-<pre>http://my-image-server/iiif/2/some-identifier/full/full/0/default.jpg
+<pre>http://my-image-server/iiif/3/some-identifier/full/max/0/default.jpg
     ?response-content-disposition=attachment%3B%20filename%3Dimage.jpg</pre>
 
-<p>The value of the query argument must be URL-encoded. In this case, the decoded form looks like: <code>attachment; filename=image.jpg</code>.</p>
+<p>The value of the query argument must be URL-encoded. In this case, the decoded form is: <code>attachment; filename=image.jpg</code>.</p>
 
 <h4 id="Overriding Cache Behavior">Overriding Cache Behavior</h4>
 
@@ -242,14 +241,10 @@ end
 
 <dl>
   <dt><code>nocache</code> or <code>false</code></dt>
-  <dd>Completely bypasses the source, derivative, and info caches, and also omits any <code>Cache-Control</code> response header that may be configured.</dd>
+  <dd>Bypasses the source, derivative, and info caches, and also omits any <code>Cache-Control</code> response header that may be configured.</dd>
   <dt><code>recache</code></dt>
-  <dd>Bypasses the derivative and info caches when reading but not writing.</dd>
+  <dd>Bypasses the derivative and info caches for reads but not writes.</dd>
 </dl>
-
-<h4 id="Processor-Specific Arguments">Processor-Specific Arguments</h4>
-
-<p>Various processors support various additional query arguments that the IIIF Image API cannot support in the path portion of an image request URL. These are detailed in the <a href="processors.html#Implementations">processor documentation</a>.</p>
 
 <hr>
 
@@ -257,7 +252,7 @@ end
 
 <p>The Control Panel is a web-based administrative interface with monitoring and configuration capabilities. To enable it, set <code>endpoint.admin.enabled</code> to <code>true</code> and set a username and secret in the <code>endpoint.admin.*</code> keys. Then, navigate to <span class="filename">/admin</span> in a web browser.</p>
 
-<p>Changes made in the Control Panel will instantly update the application's configuration, although some changes will require a restart to take effect. They will also be written to the configuration file within a few seconds.</p>
+<p>Changes made in the Control Panel will instantly update the <a href="configuration.html">application configuration</a>, although some will require a restart to take effect. They will also be written to the configuration file within a few seconds.</p>
 
 <hr>
 
@@ -291,7 +286,7 @@ end
 </p>
 
 <p class="text-info">
-  <i class="fa fa-info-circle"></i> Invoking a <code>POST /tasks</code> request creates an asynchronous task identified by a UUID and submits it to a processing queue. Its status can be checked via <code>GET /tasks/:uuid</code>. Tasks are retained in memory, but are not persisted, so checking a task after a restart will result in a <code>404 Not Found</code> response.
+  <i class="fa fa-info-circle"></i> Invoking a <code>POST /tasks</code> request creates an asynchronous task identified by a UUID and submits it to a processing queue. Its status can be checked via <code>GET /tasks/:uuid</code>. Task records are retained in memory, but are not persisted, so checking a task after a restart will result in a <code>404 Not Found</code> response.
 </p>
 
 <h3 id="HTTP API Status">Status</h3>

@@ -35,11 +35,11 @@ title: Configuration
 
 <h3 id="EnvironmentConfiguration">Environment Configuration</h3>
 
-<p>Key names in the environment are uppercased versions of &quot;ordinary&quot; configuration key names, with all non-alphanumerics replaced with underscores. For example, the following key-value pair in the configuration file:</p>
+<p>Key names in the environment are uppercased versions of the key names in the configuration file, with all non-alphanumerics replaced with underscores. For example, the following key-value pair in the configuration file:</p>
 
 <p><code>endpoint.iiif.2.enabled = true</code></p>
 
-<p>When set in the environment, would become:</p>
+<p>Would be set in the environment as:</p>
 
 <p><code>ENDPOINT_IIIF_2_ENABLED=true</code></p>
 
@@ -49,7 +49,7 @@ title: Configuration
 
 <p>Configuration files are encoded in the human-friendly <a href="https://en.wikipedia.org/wiki/.properties">.properties format</a>. A sample file, called <span class="filename">cantaloupe.properties.sample</span>, is included in the distribution archive. It is recommended to make a copy of this file and use the copy as your main configuration file. It can be located anywhere, and named anything.</p>
 
-<p>Supply the <code>-Dcantaloupe.config</code> VM option, pointing to an absolute or relative path to the file, to tell the application where the file is located. (See <a href="getting-started.html#Running">Getting Started</a> for examples.)</p>
+<p>At startup, supply the <code>-Dcantaloupe.config</code> VM option, pointing to an absolute or relative path to the file. (See <a href="getting-started.html#Running">Getting Started</a> for examples.)</p>
 
 <h4 id="Inheritance">Inheritance</h4>
 
@@ -61,9 +61,11 @@ title: Configuration
 
 <h4 id="Live Changes">Live Changes</h4>
 
-<p>The configuration file will be automatically reloaded within a few seconds of a change. Changes to most keys take effect immediately, but some require a restart; see the inline comments for documentation of which.</p>
+<p>A dedicated application thread constantly watches the configuration file for changes and automatically reloads it within a few seconds of a change. Changes to most keys take effect immediately, but some require a restart; see the inline comments for documentation of which.</p>
 
 <p>When using <a href="#Inheritance">inheritance</a>, any file in the <code>extends</code> chain that changes will be reloaded by all instances in whose <code>extends</code> chain it appears.</p>
+
+<p class="text-info"><i class="fa fa-info-circle"></i> Change-watching depends on the event notification features of the underlying filesystem, which are platform-dependent and not necessarily predictable. This feature is meant only to make configuration more convenient and should not be depended on for other purposes.</p>
 
 <hr>
 
