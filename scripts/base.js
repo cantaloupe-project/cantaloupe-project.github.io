@@ -36,5 +36,6 @@ function injectLatestReleaseInfo() {
         var button = $('.download-button');
         button.attr('href', release.assets[0].browser_download_url);
         button.html(button.html() + ' ' + release.tag_name);
+        $('.latest-release').text(release.tag_name);
     });
 }

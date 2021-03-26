@@ -30,7 +30,7 @@ title: Home
       <div class="card-body">
         <h4 class="card-title">Easy</h4>
         <ul>
-          <li>Get started in minutes. A web server is built right in, or deploy to a container, if you want.</li>
+          <li>Get started in minutes. A web server is built right in.</li>
           <li><span class="text-info">One human-friendly configuration file</span> with extensive inline help.</li>
         </ul>
       </div>
@@ -40,7 +40,7 @@ title: Home
       <div class="card-body">
         <h4 class="card-title">Standards-Compliant</h4>
         <ul>
-          <li>Fully conformant to all <span class="text-info">IIIF Image API</span> versions through 2.1.1.</li>
+          <li>Fully conformant to all <span class="text-info">IIIF Image API</span> versions through 3.0.</li>
         </ul>
       </div>
     </div>
@@ -63,8 +63,9 @@ title: Home
       <div class="card-body">
         <h4 class="card-title">Flexible</h4>
         <ul>
-          <li>Drive deep-zooming image viewers and create thumbnails for images, PDFs, and videos on-the-fly.</li>
           <li>Serve images from multiple sources, with different settings, via the same application instance.</li>
+          <li>Customize behavior using a delegate class written in Ruby or Java.</li>
+          <li>Dynamically transform embedded XMP image metadata.</li>
           <li>HTTP methods for common management functions like purging the cache and updating the configuration.</li>
         </ul>
       </div>
@@ -98,7 +99,7 @@ title: Home
         <ul>
           <li><span class="text-info">Optimized JPEG2000 and TIFF readers</span> capable of excellent performance with massive images.</li>
           <li>Available <span class="text-info">filesystem, database, Redis, in-memory, and cloud storage caches</span> to speed up response times and reduce server load.</li>
-          <li>In-memory image metadata and delegate result caches to boost performance for frequently-accessed resources.</li>
+          <li>An in-memory metadata cache boosts performance for frequently-accessed images.</li>
         </ul>
       </div>
     </div>
@@ -117,11 +118,12 @@ title: Home
 
           <a href="https://github.com/cantaloupe-project/cantaloupe/releases" class="btn btn-lg btn-success download-button"><i class="fa fa-download"></i> Download</a>
 
-          <p class="text-muted">Requires Java 8+</p>
-          <p class="text-muted">Optional components, such as particular processors, may have other dependencies; see the <a href="manual/">user manual</a>.</p>
+          <p class="text-muted">Requires Java 11+</p>
 
           <p><a class="btn btn-sm btn-dark" href="https://github.com/cantaloupe-project/cantaloupe/releases">
             <i class="fa fa-download"></i> Download an Older Version</a></p>
+
+          <p class="text-muted">Optional components, such as particular processors, may have other dependencies; see the <a href="manual/">user manual</a>.</p>
         </div>
       </div>
     </div>
@@ -150,19 +152,19 @@ title: Home
         <div class="tab-content">
           <div class="tab-pane fade show active" id="run-mac" role="tabpanel" aria-labelledby="run-mac-tab">
             <p>From a command prompt:</p>
-            <pre>java -Dcantaloupe.config=/path/to/cantaloupe.properties -Xmx2g -jar cantaloupe-x.x.x.war</pre>
+            <pre>java -Dcantaloupe.config=/path/to/cantaloupe.properties -Xmx2g -jar cantaloupe-<span class="latest-release">x.x.x</span>.jar</pre>
           </div>
           <div class="tab-pane fade" id="run-windows" role="tabpanel" aria-labelledby="run-windows-tab">
             <p>From a command prompt:</p>
-            <pre>java -Dcantaloupe.config=C:\path\to\cantaloupe.properties -Xmx2g -jar cantaloupe-x.x.x.war</pre>
+            <pre>java -Dcantaloupe.config=C:\path\to\cantaloupe.properties -Xmx2g -jar cantaloupe-<span class="latest-release">x.x.x</span>.jar</pre>
           </div>
         </div>
 
         <p>Now, assuming you have an image named <span class="filename">image.tif</span>, try accessing:</p>
 
         <ul>
-          <li><a href="http://localhost:8182/iiif/2/image.tif/info.json">http://localhost:8182/iiif/2/image.tif/info.json</a></li>
-          <li><a href="http://localhost:8182/iiif/2/image.tif/0,0,200,200/full/0/default.jpg">http://localhost:8182/iiif/2/image.tif/0,0,200,200/full/0/default.jpg</a></li>
+          <li><a href="http://localhost:8182/iiif/3/image.tif/info.json">http://localhost:8182/iiif/3/image.tif/info.json</a></li>
+          <li><a href="http://localhost:8182/iiif/3/image.tif/0,0,200,200/max/0/default.jpg">http://localhost:8182/iiif/3/image.tif/0,0,200,200/max/0/default.jpg</a></li>
         </ul>
       </div>
     </div>
