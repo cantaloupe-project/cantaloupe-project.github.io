@@ -26,7 +26,6 @@ title: Deployment
   </li>
   <li><a href="#SSL/TLS">SSL/TLS</a></li>
   <li><a href="#HTTP/2">HTTP/2</a></li>
-  <li><a href="#Docker">Docker</a></li>
 </ul>
 
 <p>This page gathers some miscellaneous notes on production deployment.</p>
@@ -63,16 +62,22 @@ title: Deployment
 
 <p>Memory requirements will vary greatly depending on <a href="processors.html">processors</a> used, source format, source image size, request image size, and request frequency. Image formats that don't support tiling or that can't be selectively decoded will require more memory to process (see <a href="#Images">Images</a>). The application will log an <code>ERROR</code>-level message if it runs out of memory.</p>
 
-<p>As a Java application, the application runs "sandboxed" inside a Java Virtual Machine (JVM), and can only use the memory the JVM makes available to it. The main area of memory of concern inside the JVM is called the heap, and, <a href="#Docker">unless running in Docker</a>, its size characteristics must be configured at startup using arguments to the <code>java</code> command. The two most important are:</p>
+<p>As a Java application, the application runs "sandboxed" inside a Java Virtual Machine (JVM), and can only use the memory the JVM makes available to it. The main area of memory of concern inside the JVM is called the heap, and its size characteristics usually must be optimized at startup using arguments to the <code>java</code> command. Some of the most relevant are:</p>
 
 <dl>
   <dt><code>-Xms</code></dt>
-  <dd>Initial heap size. The heap may grow beyond this up to the maximum size, with perhaps a performance penalty during "growth spurts."</dd>
+  <dd>Initial heap size in absolute units. The heap may grow beyond this up to the maximum size, with perhaps a performance penalty during "growth spurts."</dd>
   <dt><code>-Xmx</code></dt>
-  <dd>Maximum heap size.</dd>
+  <dd>Maximum heap size in absolute units.</dd>
+  <dt><code>-XX:InitialRAMPercentage</code></dt>
+  <dd>Like -Xms but expressed as a fraction of total available memory.</dd>
+  <dt><code>-XX:MaxRAMPercentage</code></dt>
+  <dd>Like -Xmx but expressed as a fraction of total available memory.</dd>
 </dl>
 
 <p>The commands in the <a href="getting-started.html">Getting Started</a> section specify a relatively small maximum heap size, and a production server may need larger.</p>
+
+<p class="text-warning"><i class="fa fa-exclamation-triangle"></i> Be careful about trusting the JVM to configure itself properly inside a container. Experimentation has shown that it tends to choose an excessively conservative heap size, such as only 25% of total container memory. In most cases, 75% should be closer to optimal.</p>
 
 <p>Operating system utilities like <code>top</code>, Task Manager, Activity Monitor, etc. can show you what a process looks like as the OS sees it, but they can't show what's happening inside a process. A tool like <a href="https://docs.oracle.com/javase/8/docs/technotes/guides/management/jconsole.html">JConsole</a>, included in the Java Development Kit (JDK), can visualize memory usage inside a running JVM.</p>
 
@@ -218,9 +223,3 @@ title: Deployment
 <h2 id="HTTP/2">HTTP/2</h2>
 
 <p>HTTP/2 is supported since version 3.4 via the <code>http.http2.enabled</code> and <code>https.http2.enabled</code> configuration keys. H2C (unencrypted) works in Java 8, but H2S (encrypted) requires at least Java 9.</p>
-
-<hr>
-
-<h2 id="Docker">Docker</h2>
-
-<p>When running in Docker, consider using JRE 8u191 or later. This version includes support for auto-detecting container CPU and memory settings (see <a href="https://www.oracle.com/technetwork/java/javase/8u191-relnotes-5032181.html#JDK-8146115">JDK 8u191 Update Release Notes</a>) as an alternative to using VM arguments like <code>-Xmx</code>.</p>

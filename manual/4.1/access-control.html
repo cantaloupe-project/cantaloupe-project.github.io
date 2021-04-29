@@ -223,7 +223,9 @@ end
 
 <p>This works transparently with zooming viewer clients, limiting the maximum available zoom level.</p>
 
-<p>URI identifiers of scale-constrained images have a suffix in the format <code>-numerator:denominator</code>. So, for example, if the client requests <code>image.tif/full/max/0/default.jpg</code>, but is only authorized to access a half-resolution version, it is redirected to <code>image.tif-1:2/full/max/0/default.jpg</code>, from which it is allowed to retrieve the full size of a dynamically half-sized version of <code>image.tif</code>.</p>
+<p>By default (see below), URI identifiers of scale-constrained images have a suffix in the format <code>-numerator:denominator</code>. So, for example, if the client requests <code>image.tif/full/max/0/default.jpg</code>, but is only authorized to access a half-resolution version, it is redirected to <code>image.tif-1:2/full/max/0/default.jpg</code>, from which it is allowed to retrieve the full size of a dynamically half-sized version of <code>image.tif</code>.</p>
+
+<p>In 4.x versions 4.1.9 and later, the scale constraint format can be customized using the <code>scale_constraint_suffix.pattern</code> and <code>scale_constraint_suffix.format</code> configuration keys. These are a stopgap solution that applies only to the 4.x series and is replaced by meta-identifier transformers in the 5.x series.</p>
 
 <h4>Example</h4>
 

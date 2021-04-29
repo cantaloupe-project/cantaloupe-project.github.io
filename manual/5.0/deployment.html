@@ -61,18 +61,22 @@ title: Deployment & Tuning
 
 <h4 id="MemoryHeapMemory">Heap Memory</h4>
 
-<p>As a Java application, the application runs "sandboxed" inside a Java Virtual Machine (JVM), and can only use the memory the JVM makes available to it. The main area of memory of concern inside the JVM is called the heap, and its size characteristics must be configured at startup using arguments to the <code>java</code> command. The two most important are:</p>
+<p>As a Java application, the application runs "sandboxed" inside a Java Virtual Machine (JVM), and can only use the memory the JVM makes available to it. The main area of memory of concern inside the JVM is called the heap, and its size characteristics must be configured at startup using arguments to the <code>java</code> command. Some of the most relevant are:</p>
 
 <dl>
   <dt><code>-Xms</code></dt>
-  <dd>Initial heap size. The heap may grow beyond this up to the maximum size, with perhaps a performance penalty during "growth spurts."</dd>
+  <dd>Initial heap size in absolute units. The heap may grow beyond this up to the maximum size, with perhaps a performance penalty during "growth spurts."</dd>
   <dt><code>-Xmx</code></dt>
-  <dd>Maximum heap size.</dd>
+  <dd>Maximum heap size in absolute units.</dd>
+  <dt><code>-XX:InitialRAMPercentage</code></dt>
+  <dd>Like -Xms but expressed as a fraction of total available memory.</dd>
+  <dt><code>-XX:MaxRAMPercentage</code></dt>
+  <dd>Like -Xmx but expressed as a fraction of total available memory.</dd>
 </dl>
 
-<p class="text-info"><i class="fa fa-info-circle"></i> These arguments aren't necessary in Docker when using JRE 8u191 or later, as that version introduced support for auto-detecting container CPU and memory settings.</p>
-
 <p>The commands in the <a href="getting-started.html">Getting Started</a> section specify a relatively small maximum heap size, and a production server may need larger.</p>
+
+<p class="text-warning"><i class="fa fa-exclamation-triangle"></i> Be careful about trusting the JVM to configure itself properly inside a container. Experimentation has shown that it tends to choose an excessively conservative heap size, such as only 25% of total container memory. In most cases, 75% should be closer to optimal.</p>
 
 <p>Operating system utilities like <code>top</code>, Task Manager, Activity Monitor, etc. can show you what a process looks like as the OS sees it, but they can't show what's happening inside a process. A tool like <a href="https://docs.oracle.com/javase/8/docs/technotes/guides/management/jconsole.html">JConsole</a>, included in the Java Development Kit (JDK), can visualize memory usage inside a running JVM.</p>
 
