@@ -15,6 +15,7 @@ title: Endpoints
         <a href="#Additional%20Features">Additional Features</a>
         <ul>
           <li><a href="#Page%20Selection">Page Selection</a></li>
+          <li><a href="#Metadata%20Exposure">Metadata Exposure</a></li>
           <li><a href="#Response%20Content%20Disposition">Response Content Disposition</a></li>
           <li><a href="#Overriding%20Cache%20Behavior">Overriding Cache Behavior</a></li>
         </ul>
@@ -225,6 +226,10 @@ end
 <h4 id="Page Selection">Page Selection</h4>
 
 <p>Some image formats support multiple pages within the same image file. When using <a href="processors.html#PdfBoxProcessor">PdfBoxProcessor</a> or some other processor/format combination that supports multiple pages, a page number argument can be supplied in the identifier path component. See <a href="images.html#MetaIdentifiers">Meta-Identifiers</a> for more information.</p>
+
+<h4 id="Metadata Exposure">Metadata Exposure</h4>
+
+<p>Metadata embedded within most supported formats can be exposed in information responses. See <a href="metadata.html#Viewing">Viewing Metadata</a>.</p>
 
 <h4 id="Response Content Disposition">Response Content Disposition</h4>
 

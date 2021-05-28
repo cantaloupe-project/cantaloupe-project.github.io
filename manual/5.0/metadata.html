@@ -9,6 +9,7 @@ title: Metadata
   <li><a href="#Overview">Overview</a></li>
   <li><a href="#Standards">Standards</a></li>
   <li><a href="#Processor%20Support">Processor Support</a></li>
+  <li><a href="#Viewing">Viewing</a></li>
   <li><a href="#Copying%20Mutating">Copying &amp; Mutating</a>
     <ul>
       <li><a href="#Verbatim%20Copying">Verbatim Copying</a></li>
@@ -90,6 +91,87 @@ title: Metadata
 <h2 id="Processor Support">Processor Support</h2>
 
 <p>Not all processors are metadata-aware; see the <a href="processors.html#Supported%20Features">table of processor-supported features</a>.</p>
+
+<h2 id="Viewing">Viewing</h2>
+
+<p>Metadata can be returned in IIIF Image API information responses using an <code>extra_iiif<em>n</em>_information_response_keys()</code> delegate method. (This requires Cantaloupe 5.0.3 or later.) An example follows:</p>
+
+{% highlight ruby %}
+def extra_iiif2_information_response_keys(options = {})
+  extra_information_response_keys
+end
+
+def extra_iiif3_information_response_keys(options = {})
+  extra_information_response_keys
+end
+
+def extra_information_response_keys
+  {
+    'exif' => context.dig('metadata', 'exif'),
+    'iptc' => context.dig('metadata', 'iptc'),
+    'xmp'  => context.dig('metadata', 'xmp_string')
+  }
+end
+{% endhighlight %}
+
+<p>This will cause keys such as the following to be added to an information response:</p>
+
+{% highlight json %}
+{
+  "@context": "http://iiif.io/api/image/2/context.json",
+  "@id": "http://localhost:8182/iiif/3/metadata.jpg",
+  "protocol": "http://iiif.io/api/image",
+  "width": 64,
+  "height": 56,
+  ...
+  "xmp": "&lt;rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\" ...",
+  "iptc": [
+    {
+      "City": "Urbana"
+    },
+    {
+      "ApplicationRecordVersion": 4
+    }
+  ],
+  "exif": {
+    "tagSet": "Baseline TIFF",
+    "fields": {
+      "Orientation": 1,
+      "XResolution": {
+        "numerator": 72,
+        "denominator": 1
+      },
+      "YResolution": {
+        "numerator": 72,
+        "denominator": 1
+      },
+      "ResolutionUnit": 2,
+      "DateTime": "2015:12:31 12:42:48",
+      "EXIFIFD": {
+        "tagSet": "EXIF",
+        "fields": {
+          "ExposureTime": {
+            "numerator": 1,
+            "denominator": 40
+          },
+          "FNumber": {
+            "numerator": 11,
+            "denominator": 5
+          },
+          "PhotographicSensitivity": 40,
+          "ExifVersion": "MDIyMQ==",
+          "DateTimeOriginal": "2015:12:31 12:42:48",
+          "DateTimeDigitized": "2015:12:31 12:42:48"
+        }
+      }
+    }
+  }
+}
+{% endhighlight %}
+
+<p>Note that the view is into the low-level metadata structures without any higher-level categorization. For example, EXIF metadata may be present in the <code>exif</code> key, but it may also be present in the XMP string.</p>
+  
+<p class="text-info"><i class="fa fa-info-circle"></i> EXIF string values ending with <code>==</code> are typically base64-encoded binary data.</p>
 
 <h2 id="Copying & Mutating">Copying &amp; Mutating</h2>
 
