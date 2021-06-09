@@ -210,8 +210,8 @@ cache.client.no_transform = true
 
 <p>Cache files are created with a <span class="filename">.tmp</span> extension and moved into place when closed for writing.</p>
 
-<p class="text-info">
-  <i class="fa fa-info-circle"></i> On macOS, files' last-modified time is used instead of their last-accessed time, as the latter is not reliable.
+<p class="text-warning">
+  <i class="fa fa-exclamation-triangle"></i> File last-access times (<code>atime</code>) are used to determine validity. Filesystems used to store cached content should <strong>not</strong> be mounted with the <code>noatime</code> option, as this will disable recording of last-access times, forcing a fallback to last-modified times (<code>mtime</code>), which don't work as well for a cache.
 </p>
 
 <hr>
