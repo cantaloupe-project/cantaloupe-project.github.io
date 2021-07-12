@@ -34,8 +34,9 @@ function getLatestRelease(onComplete) {
 function injectLatestReleaseInfo() {
     getLatestRelease(function(release) {
         var button = $('.download-button');
+        var releaseName = release.tag_name.substring(1);
         button.attr('href', release.assets[0].browser_download_url);
-        button.html(button.html() + ' ' + release.tag_name);
-        $('.latest-release').text(release.tag_name);
+        button.html(button.html() + ' ' + releaseName);
+        $('.latest-release').text(releaseName);
     });
 }
