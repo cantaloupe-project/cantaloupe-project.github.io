@@ -237,7 +237,7 @@ end
 
 {% highlight ruby %}
 class CustomDelegate
-  def pre_authorize(options = {})
+  def authorize(options = {})
     header = context['request_headers']
                  .select{ |name, value| name.downcase == 'authorization' }
                  .values.first
@@ -249,10 +249,6 @@ class CustomDelegate
         'status_code' => 401,
         'challenge' => 'Bearer charset="UTF-8"'
     }
-  end
-
-  def authorize(options = {})
-    true
   end
 end
 {% endhighlight %}
@@ -285,7 +281,7 @@ class CustomDelegate
   # The maximum scale allowed to unauthorized clients.
   MAX_UNAUTHORIZED_R = Rational(1, 2)
 
-  def pre_authorize(options = {})
+  def authorize(options = {})
     header = context['request_headers']
                   .select{ |name, value| name.downcase == 'authorization' }
                   .values.first
@@ -322,10 +318,6 @@ class CustomDelegate
     }
   end
 
-  def authorize(options = {})
-    true
-  end
-
   def valid?(token)
     # check whether the token is valid and return true or false
   end
@@ -340,7 +332,7 @@ class CustomDelegate extends AbstractJavaDelegate implements JavaDelegate {
     private static final int[] MAX_UNAUTHORIZED_SCALE = new int[] {1, 2};
 
     @Override
-    public Object preAuthorize() {
+    public Object authorize() {
         String headerValue = getContext().getRequestHeaders()
             .stream()
             .filter((k,v) -> "authorization".equals(k.toLowerCase()))
