@@ -1,0 +1,1 @@
+typeSearchIndex = [{"p":"edu.illinois.library.cantaloupe.delegate","l":"AbstractJavaDelegate"},{"l":"All Classes","url":"allclasses-index.html"},{"p":"edu.illinois.library.cantaloupe.delegate","l":"JavaContext"},{"p":"edu.illinois.library.cantaloupe.delegate","l":"JavaDelegate"},{"p":"edu.illinois.library.cantaloupe.delegate","l":"Logger"}]

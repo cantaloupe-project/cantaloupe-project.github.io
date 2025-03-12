@@ -1,0 +1,209 @@
+---
+layout: manual_6.0
+title: Overlays
+---
+
+<h1>Overlays</h1>
+
+<ul class="toc">
+  <li><a href="#Overview">Overview</a></li>
+  <li>
+    <a href="#Modes%20of%20Operation">Modes of Operation</a>
+    <ul>
+        <li><a href="#BasicStrategy">BasicStrategy</a></li>
+        <li><a href="#ScriptStrategy">ScriptStrategy</a></li>
+    </ul>
+  </li>
+  <li><a href="#Positioning">Positioning</a></li>
+  <li>
+    <a href="#Image%20Overlays">Image Overlays</a>
+    <ul>
+      <li><a href="#Image%20BasicStrategy%20Examples">BasicStrategy Examples</a></li>
+      <li><a href="#Image%20ScriptStrategy%20Examples">ScriptStrategy Examples</a></li>
+    </ul>
+  </li>
+  <li>
+    <a href="#String%20Overlays">String Overlays</a>
+    <ul>
+      <li><a href="#String%20BasicStrategy%20Examples">BasicStrategy Examples</a></li>
+      <li><a href="#String%20ScriptStrategy%20Examples">ScriptStrategy Examples</a></li>
+    </ul>
+  </li>
+  <li><a href="#With%20Zooming%20Viewers">With Zooming Viewers</a></li>
+</ul>
+
+<h2 id="Overview">Overview</h2>
+
+<p>The overlay feature overlays an image or text string on top of a derivative (output) image. This can be useful for description, branding, attribution, copyright notices, and so on.</p>
+
+<p>With both types of overlays, the position, inset, and output dimensions threshold (below which the overlay won't be drawn) are configurable.</p>
+
+<hr>
+
+<h2 id="Modes of Operation">Modes of Operation</h2>
+
+<p>The overlay system offers two "strategies," or modes of operation: a basic strategy, where overlay properties are set in the configuration file and applied to all requests; and a script strategy, where the decision of whether to apply an overlay, and what kind, depends on the return value of a delegate method. The <code>overlays.strategy</code> configuration key is used to set the strategy.</p>
+
+<h3 id="BasicStrategy">BasicStrategy</h3>
+
+<p>With BasicStrategy, the <code>overlays.BasicStrategy.*</code> keys in the configuration file are used to set an overlay type (image or string), position, inset, and others. This strategy is easy to configure and is all that is needed when it is intended for the same overlay to be applied to all images.</p>
+
+<h3 id="ScriptStrategy">ScriptStrategy</h3>
+
+<p>Perhaps you want to apply an image overlay to some of your images, and to others, you want to apply a string overlay, or no overlay. Perhaps you want to control overlays based on the client's IP address or user agent. Using the <code>overlay()</code> delegate method, this can be accomplished in just a few lines of code.</p>
+
+<hr>
+
+<h2 id="Positioning">Positioning</h2>
+
+<p>Position and inset are configurable. Supported positions are <code>top left</code>, <code>top center</code>, <code>top right</code>, <code>left center</code>, <code>center</code>, <code>right center</code>, <code>bottom left</code>, <code>bottom center</code>, and <code>bottom right</code>. Image overlays also support <code>repeat</code> and <code>scaled</code>. All positions except <code>repeat</code> support an inset.</p>
+
+<hr>
+
+<h2 id="Image Overlays">Image Overlays</h2>
+
+<p>An image overlay must be an 8-bit RGB or RGBA PNG image. It will be blended pixel-for-pixel into the output image.</p>
+
+<p>Overlay images can be located on the filesystem or a web server. Regardless, they are cached in memory after being loaded the first time.</p>
+
+<p class="text-info">
+  <i class="fa fa-info-circle"></i> When using multiple image overlays, their filenames must all be different, regardless of where they reside.
+</p>
+
+<p class="text-center">
+  <a class="btn btn-primary" href="images/overlay-sample.png">
+    <i class="fa fa-download"></i>
+    Sample overlay image (PNG)
+  </a>
+</p>
+
+<p class="text-info">
+  <i class="fa fa-info-circle"></i> The sample image above is opaque. To achieve the semi-transparency that some of the examples below demonstrate, the alpha channel must be rescaled in an image editor.
+</p>
+
+<h3 id="Image BasicStrategy Examples">BasicStrategy Examples</h3>
+
+<figure>
+  <img src="images/image-overlay-1600.jpg" class="img img-fluid" alt="Image with image overlay applied.">
+  <code><pre>overlays.strategy = BasicStrategy
+overlays.BasicStrategy.type = image
+overlays.BasicStrategy.image = /path/to/image.png
+overlays.BasicStrategy.position = bottom right</pre></code>
+</figure>
+
+<figure>
+  <img src="images/image-repeat-overlay-1600.jpg" class="img img-fluid" alt="Image with repeating image overlay applied.">
+  <code><pre>overlays.strategy = BasicStrategy
+overlays.BasicStrategy.type = image
+overlays.BasicStrategy.image = /path/to/image.png
+overlays.BasicStrategy.position = repeat</pre></code>
+</figure>
+
+<figure>
+  <img src="images/image-scaled-overlay-1600.jpg" class="img img-fluid" alt="Image with scaled image overlay applied.">
+  <code><pre>overlays.strategy = BasicStrategy
+overlays.BasicStrategy.type = image
+overlays.BasicStrategy.image = /path/to/image.png
+overlays.BasicStrategy.position = scaled</pre></code>
+</figure>
+
+<h3 id="Image ScriptStrategy Examples">ScriptStrategy Examples</h3>
+
+{% highlight ruby %}
+class CustomDelegate
+  MIN_SIZE_CUTOFF = 300
+
+  def overlay(options = {})
+    resulting_size = context['resulting_size']
+    return nil if resulting_size['width'] < MIN_SIZE_CUTOFF or
+        resulting_size['height'] < MIN_SIZE_CUTOFF
+    {
+      'image' => '/path/to/overlay.png',
+      'position' => 'bottom right',
+      'inset' => 5
+    }
+  end
+end
+{% endhighlight %}
+
+<hr>
+
+<h2 id="String Overlays">String Overlays</h2>
+
+<p>String overlays are dynamically rendered onto an image using Java 2D. The font family, size, weight, color, stroke color, background color and opacity, etc., are configurable.</p>
+
+<p>Line breaks within the string (<code>\n</code>) are respected, enabling multi-line strings. Each line is auto-aligned to the edge of the image according to the <a href="#Positioning">overlay position</a>.</p>
+
+<h3>Layout</h3>
+
+<p>When using BasicStrategy, the lines of the string are applied verbatim and not wrapped or broken in any way. If a string doesn't fit entirely inside the image at its specified font size, the application will try to use the largest font size that fits, down to the configurable minimum allowed size. If none fit, the string won't be drawn.</p>
+
+<p>ScriptStrategy can work the same way, but it also supports a word wrap mode, which can be enabled by returning a value of <code>true</code> for a <code>word_wrap</code> key in the hash returned from <code>overlay()</code>. When word wrap is enabled, the string is broken at word boundaries to fit inside the width of the image. If the resulting string's height exceeds the image's height, it won't be drawn.</p>
+
+<p class="text-info">
+  <i class="fa fa-info-circle"></i> To get a list of all available fonts, start the JVM with the <code>-list-fonts</code> command-line argument.</p>
+
+<h3 id="String BasicStrategy Examples">BasicStrategy Examples</h3>
+
+<figure>
+  <img src="images/string-overlay-1600.jpg" class="img img-fluid" alt="Image with string overlay applied.">
+  <code><pre>overlays.strategy = BasicStrategy
+overlays.BasicStrategy.type = string
+overlays.BasicStrategy.string = McKinley Marina\nMilwaukee, Wisconsin, USA
+overlays.BasicStrategy.string.color = white
+overlays.BasicStrategy.string.background.color = rgba(0,0,0,0.5)
+overlays.BasicStrategy.position = bottom left
+overlays.BasicStrategy.inset = 10</pre></code>
+</figure>
+
+<h3 id="String ScriptStrategy Examples">ScriptStrategy Examples</h3>
+
+<p>This example renders the image identifier onto the image.</p>
+
+{% highlight ruby %}
+class CustomDelegate
+  MIN_SIZE_CUTOFF = 300
+
+  def overlay(options = {})
+    resulting_size = context['resulting_size']
+    return nil if resulting_size['width'] < MIN_SIZE_CUTOFF or
+        resulting_size['height'] < MIN_SIZE_CUTOFF
+    {
+      'string' => context['identifier'],
+      'position' => 'bottom left',
+      'inset' => 5,
+      'font' => 'Helvetica',
+      'font_size' => 20,
+      'font_min_size' => 18,
+      'font_weight' => 1.0,
+      'color' => 'white',
+      'background_color' => 'rgba(0, 0, 0, 0.6)'
+      'glyph_spacing' => 0,
+      'stroke_color' => 'black',
+      'stroke_width' => 1,
+      'word_wrap' => false
+    }
+  end
+end
+{% endhighlight %}
+
+<hr>
+
+<h2 id="With Zooming Viewers">With Zooming Viewers</h2>
+
+<p>Zooming image viewers display a mosaic of cropped image tiles. There are a few techniques that can prevent each tile from receiving an overlay:</p>
+
+<ul>
+  <li>Set the <code>overlays.BasicStrategy.output_width_threshold</code> and <code>overlays.BasicStrategy.output_height_threshold</code> configuration options to values that are slightly larger than the tile size used by the image viewer. This will disable overlays for images the size of image viewer tiles, and enable them for anything larger. Be aware, though, that the tile size used by the viewer may differ depending on the source image.</li>
+  <li>Have the zooming viewer supply a URI query argument, and check for it in the <code>overlay()</code> delegate method. Of course, a user could figure this out and supply the same argument in other image requests.</li>
+  <li>Using <a href="#ScriptStrategy">ScriptStrategy</a>, return <code>nil</code> if a crop operation is present in the operation list. Example:
+    {% highlight ruby %}
+class CustomDelegate
+  def overlay(options = {})
+    return nil if context['operations'].find{ |op| op['class'].include?('Crop') }
+    # ...
+  end
+end
+    {% endhighlight %}
+  </li>
+</ul>

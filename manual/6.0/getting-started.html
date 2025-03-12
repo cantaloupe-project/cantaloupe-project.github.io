@@ -1,0 +1,74 @@
+---
+layout: manual_6.0
+title: Getting Started
+---
+
+<h1>Getting Started</h1>
+
+<ul class="toc">
+  <li><a href="#Requirements">Requirements</a></li>
+  <li><a href="#Configuration">Configuration</a></li>
+  <li><a href="#Running">Running</a>
+    <ul>
+      <li><a href="#Command%20Line">Command Line</a></li>
+      <li><a href="#Docker">Docker</a></li>
+    </ul>
+  </li>
+  <li><a href="#Deploying">Deploying</a></li>
+</ul>
+
+<h2 id="Requirements">Requirements</h2>
+
+<p>The base requirement is Java 11. Newer versions are also likely to work. Optional components, like particular <a href="sources.html">sources</a>, <a href="processors.html">processors</a>, or <a href="caching.html">caches</a>, may have requirements of their own.</p>
+
+<hr>
+
+<h2 id="Configuration">Configuration</h2>
+
+<p>The distribution archive bundles a sample configuration file, named <span class="filename">cantaloupe.properties.sample</span>. Make a copy of it. The copy can be named anything, but hereafter it will be referred to as <span class="filename">cantaloupe.properties</span>.</p>
+
+<p>Next, open it in a text editor and set <code>FilesystemSource.BasicLookupStrategy.path_prefix</code> to a folder path containing some images.</p>
+
+<hr>
+
+<h2 id="Running">Running</h2>
+
+<h3 id="Command Line">Command Line</h3>
+
+<p>From a command prompt, invoke the following command:</p>
+
+<ul class="nav nav-pills" role="tablist">
+  <li class="nav-item">
+    <a class="nav-link active" id="run-linux-tab1" data-toggle="tab" href="#run-linux1" role="tab" aria-controls="home" aria-selected="true">macOS/Linux</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" id="run-windows-tab1" data-toggle="tab" href="#run-windows1" role="tab" aria-controls="profile" aria-selected="false">Windows</a>
+  </li>
+</ul>
+<div class="tab-content">
+  <div class="tab-pane fade show active" id="run-linux1" role="tabpanel" aria-labelledby="run-linux-tab1">
+    <pre>java -Dcantaloupe.config=/path/to/cantaloupe.properties -Xmx2g -jar cantaloupe-<span class="version">5.0</span>.x.jar</pre>
+  </div>
+  <div class="tab-pane fade" id="run-windows1" role="tabpanel" aria-labelledby="run-windows-tab1">
+    <pre>java -Dcantaloupe.config=C:\path\to\cantaloupe.properties -Xmx2g -jar cantaloupe-<span class="version">5.0</span>.x.jar</pre>
+  </div>
+</div>
+
+<p>Assuming you have an image named <span class="filename">image.tif</span>, try accessing:</p>
+
+<ul>
+  <li><a href="http://localhost:8182/iiif/3/image.tif/info.json">http://localhost:8182/iiif/3/image.tif/info.json</a></li>
+  <li><a href="http://localhost:8182/iiif/3/image.tif/0,0,200,200/max/0/default.jpg">http://localhost:8182/iiif/3/image.tif/0,0,200,200/max/0/default.jpg</a></li>
+</ul>
+
+<p>The <code>-Xmx2g</code> argument tells the JVM that it can use a maximum of 2 GB of heap space, which should be plenty for evaluation, but maybe not for production&mdash;see <a href="deployment.html#HardwareMemory">Memory Considerations</a>.</p>
+
+<h3 id="Docker">Docker</h3>
+
+<p>There is currently no official Docker image. Docker is used to run the tests in continuous integration, so <a href="https://github.com/cantaloupe-project/cantaloupe/blob/develop/docker">the Dockerfiles for those</a> could be a helpful starting point.</p>
+
+<hr>
+
+<h2 id="Deploying">Deploying</h2>
+
+<p>Before deploying to production, see <a href="deployment.html">Deployment &amp; Tuning</a>.</p>
