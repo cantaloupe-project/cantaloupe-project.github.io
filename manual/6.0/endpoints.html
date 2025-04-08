@@ -1,0 +1,489 @@
+---
+layout: manual_6.0
+title: Endpoints
+---
+
+<h1>Endpoints</h1>
+
+<ul class="toc">
+  <li><a href="#Image%20Endpoints">Image Endpoints</a>
+    <ul>
+      <li><a href="#IIIFImageAPI3">IIIF Image API 3</a></li>
+      <li><a href="#IIIFImageAPI2">IIIF Image API 2</a></li>
+      <li><a href="#IIIFImageAPI1">IIIF Image API 1</a></li>
+      <li>
+        <a href="#Additional%20Features">Additional Features</a>
+        <ul>
+          <li><a href="#Page%20Selection">Page Selection</a></li>
+          <li><a href="#Metadata%20Exposure">Metadata Exposure</a></li>
+          <li><a href="#Response%20Content%20Disposition">Response Content Disposition</a></li>
+          <li><a href="#Overriding%20Cache%20Behavior">Overriding Cache Behavior</a></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li><a href="#Control%20Panel">Control Panel</a></li>
+  <li><a href="#Health%20Check">Health Check</a></li>
+  <li>
+    <a href="#HTTP%20API">HTTP API</a>
+    <ul>
+      <li>
+        <a href="#HTTP%20API%20Status">Status</a></li>
+        <ul>
+          <li><a href="#check-status">Check application status</a></li>
+        </ul>
+      </li>
+      <li>
+        <a href="#Configuration">Configuration</a>
+        <ul>
+          <li><a href="#retrieve-configuration">Retrieve the configuration</a></li>
+          <li><a href="#update-configuration">Update the configuration</a></li>
+        </ul>
+      </li>
+      <li>
+        <a href="#Caching">Caching</a>
+        <ul>
+          <li><a href="#PurgeInvalidFromCache">Purge invalid/expired content from all caches</a></li>
+          <li><a href="#PurgeItemFromCache">Purge all content relating to an individual source image from all caches</a></li>
+          <li><a href="#PurgeCache">Purge all content from all caches</a></li>
+          <li><a href="#PurgeInfoCache">Purge the info cache</a>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="Image Endpoints">Image Endpoints</h2>
+
+<h3 id="IIIFImageAPI3">IIIF Image API 3</h3>
+
+<h4>Documentation</h4>
+
+<ul>
+  <li><a href="https://iiif.io/api/image/3.0/">IIIF Image API 3.0</a></li>
+</ul>
+
+<h4>Location</h4>
+
+<p>This endpoint is available at <span class="filename">/iiif/3</span>.</p>
+
+<h4>Enabling/Disabling</h4>
+
+<p>This endpoint can be enabled or disabled using the <code>endpoint.iiif.3.enabled</code> configuration key.</p>
+
+<h4>Compliance</h4>
+
+<p>Version 3.0 of this API is implemented at a <a href="https://iiif.io/api/image/3.0/compliance/">compliance level</a> of 2.</p>
+
+<h4>Information Response Notes</h4>
+
+<dl>
+  <dt><code>sizes</code></dt>
+  <dd>An array of width/height pairs according to the formula <i>dimension &times; 1/2<sup>n</sup> &gt; <code>endpoint.iiif.min_size</code></i>. (To restrict access to only these sizes, use the <code>endpoint.iiif.restrict_to_sizes</code> configuration option.)</dd>
+  <dt><code>tiles</code></dt>
+  <dd>Contains a tile size that will be relatively efficient to deliver, along with a list of scale factors at which each size is available.
+    <ul>
+      <li>For images that are natively tiled, the <code>width</code> and <code>height</code> are a multiple of the native tile dimensions no smaller than the value of the <code>endpoint.iiif.min_tile_size</code> configuration key.</li>
+      <li>For untiled images, they are based on the <code>endpoint.iiif.min_tile_size</code> configuration key.</li>
+    </ul>
+  </dd>
+  <dt><code>maxArea</code></dt>
+  <dd>This value reflects the settings of <code>max_pixels</code> and <code>max_scale</code>.</dd>
+</dl>
+
+<h5 id="Additional Information Response Keys">Additional Information Response Keys</h5>
+
+<p>Custom keys can be added to the information JSON response, such as to declare <a href="https://iiif.io/api/annex/services/">service profiles</a> or add a <a href="https://iiif.io/api/image/3.0/#56-rights">rights statement</a>. The <a href="delegate-system.html">delegate class</a> needs to implement the <code>extra_iiif3_information_response_keys()</code> method. An example implementation follows:</p>
+
+{% highlight ruby %}
+class CustomDelegate
+  def extra_iiif3_information_response_keys(options = {})
+    {
+      'rights' => 'http://example.org/license.html',
+      'service' => [
+        {
+          '@id': 'https://example.org/auth/login',
+          '@type': 'AuthCookieService1',
+          'profile': 'http://iiif.io/api/auth/1/login',
+          'label': 'Log In'
+        }
+      ]
+    }
+  end
+end
+{% endhighlight %}
+
+<h3 id="IIIFImageAPI2">IIIF Image API 2</h3>
+
+<h4>Documentation</h4>
+
+<ul>
+  <li><a href="https://iiif.io/api/image/2.0/">IIIF Image API 2.0</a></li>
+  <li><a href="https://iiif.io/api/image/2.1/">IIIF Image API 2.1</a></li>
+</ul>
+
+<h4>Location</h4>
+
+<p>This endpoint is available at <span class="filename">/iiif/2</span>.</p>
+
+<h4>Enabling/Disabling</h4>
+
+<p>This endpoint can be enabled or disabled using the <code>endpoint.iiif.2.enabled</code> configuration key.</p>
+
+<h4>Compliance</h4>
+
+<p>Version 2.1.1 of this API is implemented. <a href="https://iiif.io/api/image/2.1/compliance/">Compliance level</a> is dynamically computed and declared on a per-processor basis. Most processors are "Level 2"-compliant.</p>
+
+<h4>Information Response Notes</h4>
+
+<dl>
+  <dt><code>sizes</code></dt>
+  <dd>An array of width/height pairs according to the formula <i>dimension &times; 1/2<sup>n</sup> &gt; <code>endpoint.iiif.min_size</code></i>. (To restrict access to only these sizes, use the <code>endpoint.iiif.restrict_to_sizes</code> configuration option.)</dd>
+  <dt><code>tiles</code></dt>
+  <dd>Contains a tile size that will be relatively efficient to deliver, along with a list of scale factors at which each size is available.
+    <ul>
+      <li>For images that are natively tiled, the <code>width</code> and <code>height</code> are a multiple of the native tile dimensions no smaller than the value of the <code>endpoint.iiif.min_tile_size</code> configuration key.</li>
+      <li>For untiled images, they are based on the <code>endpoint.iiif.min_tile_size</code> configuration key.</li>
+    </ul>
+  </dd>
+  <dt><code>profile.formats</code></dt>
+  <dd>This list of output formats depends on the processor assigned to the format of the source image.</dd>
+  <dt><code>profile.maxArea</code></dt>
+  <dd>This value reflects the settings of <code>max_pixels</code> and <code>max_scale</code>.</dd>
+  <dt><code>profile.qualities</code></dt>
+  <dd>Depends on the qualities supported by the processor assigned to the format of the source image.</dd>
+  <dt><code>profile.supports</code></dt>
+  <dd>Dynamically computed based on the features supported by the processor assigned to the format of the source image, features built into the image server itself, and various other configuration options.</dd>
+  <dt>Other keys (<code>attribution</code>, <code>service</code>, etc.)</dt>
+  <dd>See <a href="#Additional Information Response Keys">Additional Information Response Keys</a>.</dd>
+</dl>
+
+<h5 id="Additional Information Response Keys">Additional Information Response Keys</h5>
+
+<p>Custom keys can be added to the information JSON response, such as to declare <a href="https://iiif.io/api/annex/services/">service profiles</a> or, beginning in Image API 2.1, an optional rights statement and/or logo. The <a href="delegate-system.html">delegate class</a> needs to implement the <code>extra_iiif2_information_response_keys()</code> method. An example implementation follows:</p>
+
+{% highlight ruby %}
+class CustomDelegate
+  def extra_iiif2_information_response_keys(options = {})
+    {
+      'attribution' => 'Copyright My Great Organization. All rights reserved.',
+      'license' => 'http://example.org/license.html',
+      'logo' => 'http://example.org/logo.png',
+      'service' => {
+        '@context' => 'http://iiif.io/api/annex/services/physdim/1/context.json',
+        'profile' => 'http://iiif.io/api/annex/services/physdim',
+        'physicalScale' => 0.0025,
+        'physicalUnits' => 'in'
+      }
+    }
+  end
+end
+{% endhighlight %}
+
+<h3 id="IIIFImageAPI1">IIIF Image API 1</h3>
+
+<h4>Documentation</h4>
+
+<ul>
+  <li><a href="https://iiif.io/api/image/1.0/">IIIF Image API 1.0</a></li>
+  <li><a href="https://iiif.io/api/image/1.1/">IIIF Image API 1.1</a></li>
+</ul>
+
+<h4>Location</h4>
+
+<p>This endpoint is available at <span class="filename">/iiif/1</span>.</p>
+
+<h4>Enabling/Disabling</h4>
+
+<p>This endpoint can be enabled or disabled using the <code>endpoint.iiif.1.enabled</code> configuration key.</p>
+
+<h4>Compliance</h4>
+
+<p>Version 1.1 of this API is implemented. Compliance level is dynamically computed and declared on a per-processor basis. Most processors are "Level 2"-compliant.</p>
+
+<h4>Information Response Notes</h4>
+
+<dl>
+  <dt><code>tile_width</code> and <code>tile_height</code></dt>
+  <dd>These keys refer to tile dimensions that will be relatively efficient to deliver.
+    <ul>
+      <li>For images that are natively tiled, these will be the smallest of the native tile dimensions, the value of the <code>endpoint.iiif.min_tile_size</code> configuration key, or the full image dimensions.</li>
+      <li>For untiled images, these will be the smallest value of <i>n</i> for the formula: <i>(smallest dimension) &times; 1/2<sup>n</sup> &gt; <code>endpoint.iiif.min_tile_size</code></i>.</li>
+    </ul>
+  </dd>
+  <dt><code>formats</code></dt>
+  <dd>This list of output formats depends on the processor assigned to the format of the source image.</dd>
+  <dt><code>qualities</code></dt>
+  <dd>Depends on the qualities supported by the processor assigned to the format of the source image.</dd>
+  <dt><code>profile</code></dt>
+  <dd>Dynamically computed based on the features supported by the processor assigned to the format of the source image, as well as features built into the image server itself.</dd>
+</dl>
+
+<h3 id="Additional Features">Additional Features</h3>
+
+<p>All endpoints support these additional features:</p>
+
+<h4 id="Page Selection">Page Selection</h4>
+
+<p>Some image formats support multiple pages within the same image file. When using <a href="processors.html#PdfBoxProcessor">PdfBoxProcessor</a> or some other processor/format combination that supports multiple pages, a page number argument can be supplied in the identifier path component. See <a href="images.html#MetaIdentifiers">Meta-Identifiers</a> for more information.</p>
+
+<h4 id="Metadata Exposure">Metadata Exposure</h4>
+
+<p>Metadata embedded within most supported formats can be exposed in information responses. See <a href="metadata.html#Viewing">Viewing Metadata</a>.</p>
+
+<h4 id="Response Content Disposition">Response Content Disposition</h4>
+
+<p>The <a href="https://tools.ietf.org/html/rfc6266"><code>Content-Disposition</code></a> HTTP response header tells clients whether to attempt to display a response entity inline or download it, perhaps accompanied by a user prompt. A <code>response-content-disposition</code> query argument can be used to suggest a value to override that on a per-request basis. This is useful for &quot;linking to a download.&quot; For example, the following URL will cause web browsers to download the image identified by <code>some-identifier</code> and save it as <span class="filename">image.jpg</span>:</p>
+
+<pre>http://my-image-server/iiif/3/some-identifier/full/max/0/default.jpg
+    ?response-content-disposition=attachment%3B%20filename%3Dimage.jpg</pre>
+
+<p>The value of the query argument must be URL-encoded. In this case, the decoded form is: <code>attachment; filename=image.jpg</code>.</p>
+
+<h4 id="Overriding Cache Behavior">Overriding Cache Behavior</h4>
+
+<p>The behavior of the <a href="caching.html">caches</a> can be overridden on a per-request basis by supplying a <code>cache</code> URL query argument with one of the following values:</p>
+
+<dl>
+  <dt><code>nocache</code> or <code>false</code></dt>
+  <dd>Bypasses the source, derivative, and info caches, and also omits any <code>Cache-Control</code> response header that may be configured.</dd>
+  <dt><code>recache</code></dt>
+  <dd>Bypasses the derivative and info caches for reads but not writes.</dd>
+</dl>
+
+<hr>
+
+<h2 id="Control Panel">Control Panel</h2>
+
+<p>The Control Panel is a web-based administrative interface with monitoring and configuration capabilities. To enable it, set <code>endpoint.admin.enabled</code> to <code>true</code> and set a username and secret in the <code>endpoint.admin.*</code> keys. Then, navigate to <span class="filename">/admin</span> in a web browser.</p>
+
+<p>Changes made in the Control Panel will instantly update the <a href="configuration.html">application configuration</a>, although some will require a restart to take effect. They will also be written to the configuration file within a few seconds.</p>
+
+<hr>
+
+<h2 id="Health Check">Health Check</h2>
+
+<p>A health check endpoint is available at <span class="filename">/health</span>. By default, it simply returns <code>HTTP 200 OK</code>, but if <code>endpoint.health.dependency_check</code> is set to <code>true</code>, it also performs several other checks:</p>
+
+<ol>
+  <li>All known-working <a href="sources.html">sources</a> are exercised to check that the underlying storage is online and readable.</li>
+  <li>The I/O functionality of the current <a href="caching.html#Source%20Cache">source cache</a> and/or <a href="caching.html#Derivative%20Cache">derivative cache</a> is checked.</li>
+</ol>
+
+<p>This makes the for a more thorough health check, but also a slower one that may be redundant if these services are already monitored.</p>
+
+<p>The JSON response includes one of three color codes:</p>
+
+<ul>
+  <li><code>GREEN</code> indicates normal functionality.</li>
+  <li><code>YELLOW</code> indicates a warning condition.</li>
+  <li><code>RED</code> indicates a failure condition.</li>
+</ul>
+
+<p>HTTP 200 is returned for <code>GREEN</code> status, and HTTP 500 for all other statuses.</p>
+
+<hr>
+
+<h2 id="HTTP API">HTTP API</h2>
+
+<p>The HTTP API is disabled by default, but can be enabled by setting the <code>endpoint.api.enabled</code> configuration option to <code>true</code>.</p>
+
+<p class="text-info">
+  <i class="fa fa-info-circle"></i> All methods require HTTP Basic authentication. Credentials are set in <code>endpoint.api.username</code> and <code>endpoint.api.secret</code>.
+</p>
+
+<p class="text-info">
+  <i class="fa fa-info-circle"></i> Invoking a <code>POST /tasks</code> request creates an asynchronous task identified by a UUID and submits it to a processing queue. Its status can be checked via <code>GET /tasks/:uuid</code>. Task records are retained in memory, but are not persisted, so checking a task after a restart will result in a <code>404 Not Found</code> response.
+</p>
+
+<h3 id="HTTP API Status">Status</h3>
+
+<h4 id="check-status">Check application status</h4>
+
+<table class="table table-bordered">
+  <tr>
+    <td>Request Method</td>
+    <td><code>GET</code></td>
+  </tr>
+  <tr>
+    <td>URI</td>
+    <td><span class="filename">/status</span></td>
+  </tr>
+  <tr>
+    <td>Expected Response Status</td>
+    <td><code>200 OK</code></td>
+  </tr>
+  <tr>
+    <td>Expected Response Content Type</td>
+    <td><code>application/json</code></td>
+  </tr>
+</table>
+
+<h3 id="Configuration">Configuration</h3>
+
+<h4 id="retrieve-configuration">Retrieve the configuration</h4>
+
+<table class="table table-bordered">
+  <tr>
+    <td>Request Method</td>
+    <td><code>GET</code></td>
+  </tr>
+  <tr>
+    <td>URI</td>
+    <td><span class="filename">/configuration</span></td>
+  </tr>
+  <tr>
+    <td>Expected Response Status</td>
+    <td><code>200 OK</code></td>
+  </tr>
+  <tr>
+    <td>Expected Response Content Type</td>
+    <td><code>application/json</code></td>
+  </tr>
+</table>
+
+<h4 id="update-configuration">Update the configuration</h4>
+
+<table class="table table-bordered">
+  <tr>
+    <td>Request Method</td>
+    <td><code>PUT</code></td>
+  </tr>
+  <tr>
+    <td>URI</td>
+    <td><span class="filename">/configuration</span></td>
+  </tr>
+  <tr>
+    <td>Request Content Type</td>
+    <td><code>application/json</code></td>
+  </tr>
+  <tr>
+    <td>Request Body</td>
+    <td>Should contain the configuration keys to change:
+      {% highlight json %}{
+  "config_key_1" : "some value",
+  "config_key_2" : "some value",
+  "config_key_3" : "some value"
+}{% endhighlight %}
+    (It isn't necessary to supply all keys; only the ones to change.)</td>
+  </tr>
+  <tr>
+    <td>Expected Response</td>
+    <td><code>200 OK</code></td>
+  </tr>
+  <tr>
+    <td>Notes</td>
+    <td>The in-memory configuration will be updated instantly, although some key changes won't take effect until the application is restarted. Changes will also be written to the configuration file within a few seconds.</td>
+  </tr>
+</table>
+
+<h3 id="Caching">Caching</h3>
+
+<h4 id="PurgeInvalidFromCache">Purge invalid/expired content from all caches</h4>
+
+<table class="table table-bordered">
+  <tr>
+    <td>Request Method</td>
+    <td><code>POST</code></td>
+  </tr>
+  <tr>
+    <td>URI</td>
+    <td><span class="filename">/tasks</span></td>
+  </tr>
+  <tr>
+    <td>Request Content Type</td>
+    <td><code>application/json</code></td>
+  </tr>
+  <tr>
+    <td>Request Body</td>
+    <td>{% highlight json %}{
+  "verb" : "PurgeInvalidFromCache"
+}{% endhighlight %}</td>
+  </tr>
+  <tr>
+    <td>Expected Response</td>
+    <td><code>202 Accepted</code> with task URI in <code>Location</code> header</td>
+  </tr>
+</table>
+
+<h4 id="PurgeItemFromCache">Purge all content relating to an individual source image from all caches</h4>
+
+<table class="table table-bordered">
+  <tr>
+    <td>Request Method</td>
+    <td><code>POST</code></td>
+  </tr>
+  <tr>
+    <td>URI</td>
+    <td><span class="filename">/tasks</span></td>
+  </tr>
+  <tr>
+    <td>Request Content Type</td>
+    <td><code>application/json</code></td>
+  </tr>
+  <tr>
+    <td>Request Body</td>
+    <td>{% highlight json %}{
+  "verb" : "PurgeItemFromCache",
+  "identifier" : "MyIdentifier"
+}{% endhighlight %}</td>
+  </tr>
+  <tr>
+    <td>Expected Response</td>
+    <td><code>202 Accepted</code> with task URI in <code>Location</code> header</td>
+  </tr>
+</table>
+
+<h4 id="PurgeCache">Purge all content from all caches</h4>
+
+<table class="table table-bordered">
+  <tr>
+    <td>Request Method</td>
+    <td><code>POST</code></td>
+  </tr>
+  <tr>
+    <td>URI</td>
+    <td><span class="filename">/tasks</span></td>
+  </tr>
+  <tr>
+    <td>Request Content Type</td>
+    <td><code>application/json</code></td>
+  </tr>
+  <tr>
+    <td>Request Body</td>
+    <td>{% highlight json %}{
+  "verb" : "PurgeCache"
+}{% endhighlight %}</td>
+  </tr>
+  <tr>
+    <td>Expected Response</td>
+    <td><code>202 Accepted</code> with task URI in <code>Location</code> header</td>
+  </tr>
+</table>
+
+<h4 id="PurgeInfoCache">Purge the info cache</h4>
+
+<table class="table table-bordered">
+  <tr>
+    <td>Request Method</td>
+    <td><code>POST</code></td>
+  </tr>
+  <tr>
+    <td>URI</td>
+    <td><span class="filename">/tasks</span></td>
+  </tr>
+  <tr>
+    <td>Request Content Type</td>
+    <td><code>application/json</code></td>
+  </tr>
+  <tr>
+    <td>Request Body</td>
+    <td>{% highlight json %}{
+  "verb" : "PurgeInfoCache"
+}{% endhighlight %}</td>
+  </tr>
+  <tr>
+    <td>Expected Response</td>
+    <td><code>202 Accepted</code> with task URI in <code>Location</code> header</td>
+  </tr>
+</table>
